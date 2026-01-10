@@ -24,6 +24,16 @@ const stylesheet = StyleSheet.create((theme, runtime) => ({
     contentContainer: {
         paddingBottom: Platform.select({ ios: 34, default: 16 }),
         paddingTop: 0,
+        // 平板响应式：居中显示，限制最大宽度
+        maxWidth: {
+            xs: '100%',
+            lg: 700,
+        },
+        alignSelf: {
+            xs: 'stretch',
+            lg: 'center',
+        },
+        width: '100%',
     },
 }));
 

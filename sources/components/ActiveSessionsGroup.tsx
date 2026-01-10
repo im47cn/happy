@@ -25,10 +25,39 @@ const stylesheet = StyleSheet.create((theme, runtime) => ({
         backgroundColor: theme.colors.groupped.background,
         paddingTop: 8,
     },
+    // 平板双列布局容器
+    projectCardsContainer: {
+        flexDirection: {
+            xs: 'column',
+            lg: 'row',
+        },
+        flexWrap: {
+            xs: 'nowrap',
+            lg: 'wrap',
+        },
+        paddingHorizontal: {
+            xs: 0,
+            lg: 8,
+        },
+    },
+    // 项目卡片组（含标题和卡片）
+    projectCardWrapper: {
+        width: {
+            xs: '100%',
+            lg: '50%',
+        },
+        paddingHorizontal: {
+            xs: 0,
+            lg: 8,
+        },
+    },
     projectCard: {
         backgroundColor: theme.colors.surface,
         marginBottom: 8,
-        marginHorizontal: Platform.select({ ios: 16, default: 12 }),
+        marginHorizontal: {
+            xs: Platform.select({ ios: 16, default: 12 }),
+            lg: 0,
+        },
         borderRadius: Platform.select({ ios: 10, default: 16 }),
         overflow: 'hidden',
         shadowColor: theme.colors.shadow.color,

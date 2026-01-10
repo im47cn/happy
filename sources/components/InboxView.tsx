@@ -7,6 +7,8 @@ import { t } from '@/text';
 import { trackFriendsSearch, trackFriendsProfileView } from '@/track';
 import { ItemGroup } from '@/components/ItemGroup';
 import { UpdateBanner } from './UpdateBanner';
+import { PwaInstallBanner } from './PwaInstallBanner';
+import { OfflineStatusBanner } from './OfflineStatusBanner';
 import { Typography } from '@/constants/Typography';
 import { useRouter } from 'expo-router';
 import { layout } from '@/components/layout';
@@ -129,6 +131,8 @@ export const InboxView = React.memo(({}: InboxViewProps) => {
                     </View>
                 )}
                 <UpdateBanner />
+                <PwaInstallBanner />
+                <OfflineStatusBanner />
                 <View style={styles.emptyContainer}>
                     <ActivityIndicator size="large" color={theme.colors.textSecondary} />
                 </View>
@@ -154,6 +158,8 @@ export const InboxView = React.memo(({}: InboxViewProps) => {
                     </View>
                 )}
                 <UpdateBanner />
+                <PwaInstallBanner />
+                <OfflineStatusBanner />
                 <View style={styles.emptyContainer}>
                     <Image
                         source={require('@/assets/images/brutalist/Brutalism 10.png')}
@@ -190,7 +196,9 @@ export const InboxView = React.memo(({}: InboxViewProps) => {
                 width: '100%'
             }}>
                 <UpdateBanner />
-                
+                <PwaInstallBanner />
+                <OfflineStatusBanner />
+
                 {feedItems.length > 0 && (
                     <>
                         <ItemGroup title={t('inbox.updates')}>

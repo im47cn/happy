@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import {
-    View,
     Modal,
     TouchableWithoutFeedback,
     Animated,
-    StyleSheet,
     KeyboardAvoidingView,
-    Platform
+    Platform,
+    useWindowDimensions
 } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 interface BaseModalProps {
     visible: boolean;
@@ -16,6 +16,8 @@ interface BaseModalProps {
     animationType?: 'fade' | 'slide' | 'none';
     transparent?: boolean;
     closeOnBackdrop?: boolean;
+    /** 是否在小屏设备上全屏显示 */
+    fullscreenOnSmall?: boolean;
 }
 
 export function BaseModal({
@@ -24,9 +26,16 @@ export function BaseModal({
     children,
     animationType = 'fade',
     transparent = true,
-    closeOnBackdrop = true
+    closeOnBackdrop = true,
+    fullscreenOnSmall = false
 }: BaseModalProps) {
     const fadeAnim = useRef(new Animated.Value(0)).current;
+    const { rt } = useUnistyles();
+    const { width, height } = useWindowDimensions();
+
+    // 小屏幕检测 (lg 断点以下)
+    const isSmallScreen = rt.breakpoint === 'xs' || rt.breakpoint === 'sm' || rt.breakpoint === 'md';
+    const shouldFullscreen = fullscreenOnSmall && isSmallScreen;
 
     useEffect(() => {
         if (visible) {
@@ -57,30 +66,37 @@ export function BaseModal({
             animationType={animationType}
             onRequestClose={onClose}
         >
-            <KeyboardAvoidingView 
-                style={styles.container}
+            <KeyboardAvoidingView
+                style={[
+                    stylesheet.container,
+                    shouldFullscreen && stylesheet.containerFullscreen
+                ]}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
-                <TouchableWithoutFeedback onPress={handleBackdropPress}>
-                    <Animated.View 
-                        style={[
-                            styles.backdrop,
-                            {
-                                opacity: fadeAnim.interpolate({
-                                    inputRange: [0, 1],
-                                    outputRange: [0, 0.5]
-                                })
-                            }
-                        ]}
-                    />
-                </TouchableWithoutFeedback>
-                
+                {!shouldFullscreen && (
+                    <TouchableWithoutFeedback onPress={handleBackdropPress}>
+                        <Animated.View
+                            style={[
+                                stylesheet.backdrop,
+                                {
+                                    opacity: fadeAnim.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: [0, 0.5]
+                                    })
+                                }
+                            ]}
+                        />
+                    </TouchableWithoutFeedback>
+                )}
+
                 <Animated.View
                     style={[
-                        styles.content,
+                        stylesheet.content,
+                        shouldFullscreen && stylesheet.contentFullscreen,
+                        shouldFullscreen && { width, height },
                         {
                             opacity: fadeAnim,
-                            transform: [{
+                            transform: shouldFullscreen ? [] : [{
                                 scale: fadeAnim.interpolate({
                                     inputRange: [0, 1],
                                     outputRange: [0.9, 1]
@@ -96,17 +112,29 @@ export function BaseModal({
     );
 }
 
-const styles = StyleSheet.create({
+const stylesheet = StyleSheet.create((theme) => ({
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
     },
+    containerFullscreen: {
+        justifyContent: 'flex-start',
+        alignItems: 'stretch'
+    },
     backdrop: {
-        ...StyleSheet.absoluteFillObject,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         backgroundColor: 'black'
     },
     content: {
         zIndex: 1
+    },
+    contentFullscreen: {
+        flex: 1,
+        backgroundColor: theme.colors.surface
     }
-});
+}));

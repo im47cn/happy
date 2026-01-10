@@ -5,13 +5,14 @@ import { ChatHeaderView } from '@/components/ChatHeaderView';
 import { ChatList } from '@/components/ChatList';
 import { Deferred } from '@/components/Deferred';
 import { EmptyMessages } from '@/components/EmptyMessages';
+import { hapticsLight } from '@/components/haptics';
 import { VoiceAssistantStatusBar } from '@/components/VoiceAssistantStatusBar';
 import { useDraft } from '@/hooks/useDraft';
 import { Modal } from '@/modal';
 import { voiceHooks } from '@/realtime/hooks/voiceHooks';
 import { startRealtimeSession, stopRealtimeSession } from '@/realtime/RealtimeSession';
 import { gitStatusSync } from '@/sync/gitStatusSync';
-import { sessionAbort } from '@/sync/ops';
+import { sessionAbort, sessionPause, sessionResume, sessionTerminate, sessionSwitch } from '@/sync/ops';
 import { storage, useIsDataReady, useLocalSetting, useRealtimeStatus, useSessionMessages, useSessionUsage, useSetting } from '@/sync/storage';
 import { useSession } from '@/sync/storage';
 import { Session } from '@/sync/storageTypes';
@@ -160,6 +161,10 @@ function SessionViewLoaded({ sessionId, session }: { sessionId: string, session:
     const { messages, isLoaded } = useSessionMessages(sessionId);
     const acknowledgedCliVersions = useLocalSetting('acknowledgedCliVersions');
 
+    // Phase 2: Control state
+    const [controlAction, setControlAction] = React.useState<'pause' | 'resume' | 'terminate' | 'switch' | null>(null);
+    const isControlling = controlAction !== null;
+
     // Check if CLI version is outdated and not already acknowledged
     const cliVersion = session.metadata?.version;
     const machineId = session.metadata?.machineId;
@@ -193,15 +198,101 @@ function SessionViewLoaded({ sessionId, session }: { sessionId: string, session:
         storage.getState().updateSessionPermissionMode(sessionId, mode);
     }, [sessionId]);
 
-    // Memoize header-dependent styles to prevent re-renders
-    const headerDependentStyles = React.useMemo(() => ({
-        contentContainer: {
-            flex: 1
-        },
-        flatListStyle: {
-            marginTop: 0 // No marginTop needed since header is handled by parent
-        },
-    }), []);
+    // Phase 2: Control handlers
+    const handlePause = React.useCallback(async () => {
+        if (isControlling) return;
+        hapticsLight();
+        setControlAction('pause');
+        try {
+            const result = await sessionPause(sessionId);
+            if (!result.success) {
+                Modal.alert(t('common.error'), result.error || t('errors.controlFailed'));
+            }
+        } catch (error) {
+            Modal.alert(t('common.error'), error instanceof Error ? error.message : t('errors.controlFailed'));
+        } finally {
+            setControlAction(null);
+        }
+    }, [sessionId, isControlling]);
+
+    const handleResume = React.useCallback(async () => {
+        if (isControlling) return;
+        hapticsLight();
+        setControlAction('resume');
+        try {
+            const result = await sessionResume(sessionId);
+            if (!result.success) {
+                Modal.alert(t('common.error'), result.error || t('errors.controlFailed'));
+            }
+        } catch (error) {
+            Modal.alert(t('common.error'), error instanceof Error ? error.message : t('errors.controlFailed'));
+        } finally {
+            setControlAction(null);
+        }
+    }, [sessionId, isControlling]);
+
+    const handleTerminate = React.useCallback(async () => {
+        if (isControlling) return;
+        hapticsLight();
+        // Confirm before terminating
+        Modal.alert(
+            t('session.terminateTitle'),
+            t('session.terminateConfirm'),
+            [
+                { text: t('common.cancel'), style: 'cancel' },
+                {
+                    text: t('session.terminate'),
+                    style: 'destructive',
+                    onPress: async () => {
+                        setControlAction('terminate');
+                        try {
+                            const result = await sessionTerminate(sessionId);
+                            if (!result.success) {
+                                Modal.alert(t('common.error'), result.error || t('errors.controlFailed'));
+                            }
+                        } catch (error) {
+                            Modal.alert(t('common.error'), error instanceof Error ? error.message : t('errors.controlFailed'));
+                        } finally {
+                            setControlAction(null);
+                        }
+                    }
+                }
+            ]
+        );
+    }, [sessionId, isControlling]);
+
+    const handleSwitchMode = React.useCallback(async () => {
+        if (isControlling) return;
+        hapticsLight();
+        // Determine target mode (toggle between local and remote)
+        const currentMode = session.metadata?.flavor === 'local' ? 'local' : 'remote';
+        const targetMode = currentMode === 'local' ? 'remote' : 'local';
+
+        // Confirm mode switch
+        Modal.alert(
+            t('session.switchModeTitle'),
+            t('session.switchModeConfirm', { mode: targetMode }),
+            [
+                { text: t('common.cancel'), style: 'cancel' },
+                {
+                    text: t('session.switchMode'),
+                    onPress: async () => {
+                        setControlAction('switch');
+                        try {
+                            const success = await sessionSwitch(sessionId, targetMode);
+                            if (!success) {
+                                Modal.alert(t('common.error'), t('errors.controlFailed'));
+                            }
+                        } catch (error) {
+                            Modal.alert(t('common.error'), error instanceof Error ? error.message : t('errors.controlFailed'));
+                        } finally {
+                            setControlAction(null);
+                        }
+                    }
+                }
+            ]
+        );
+    }, [sessionId, session.metadata?.flavor, isControlling]);
 
 
     // Handle microphone button press - memoized to prevent button flashing
@@ -347,6 +438,157 @@ function SessionViewLoaded({ sessionId, session }: { sessionId: string, session:
                     </Text>
                     <Ionicons name="close" size={14} color="#856404" style={{ marginLeft: 8 }} />
                 </Pressable>
+            )}
+
+            {/* Phase 2: Session Control Bar - shown when session is online */}
+            {session.presence === 'online' && (
+                <View
+                    testID="session-control-bar"
+                    style={{
+                        position: 'absolute',
+                        top: shouldShowCliWarning ? 48 : 8,
+                        right: 16,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 8,
+                        zIndex: 997,
+                    }}
+                >
+                    {/* Pause/Resume Button */}
+                    {session.executionState === 'paused' ? (
+                        <Pressable
+                            testID="session-control-resume"
+                            onPress={handleResume}
+                            disabled={isControlling}
+                            style={{
+                                backgroundColor: theme.dark ? 'rgba(52, 199, 89, 0.2)' : 'rgba(52, 199, 89, 0.15)',
+                                borderRadius: 20,
+                                paddingHorizontal: 12,
+                                paddingVertical: 8,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                opacity: isControlling ? 0.5 : 1,
+                            }}
+                        >
+                            {controlAction === 'resume' ? (
+                                <ActivityIndicator size="small" color="#34C759" />
+                            ) : (
+                                <>
+                                    <Ionicons name="play" size={16} color="#34C759" />
+                                    <Text style={{ color: '#34C759', fontSize: 13, fontWeight: '600', marginLeft: 4 }}>
+                                        {t('session.resume')}
+                                    </Text>
+                                </>
+                            )}
+                        </Pressable>
+                    ) : (
+                        <Pressable
+                            testID="session-control-pause"
+                            onPress={handlePause}
+                            disabled={isControlling}
+                            style={{
+                                backgroundColor: theme.dark ? 'rgba(255, 204, 0, 0.2)' : 'rgba(255, 204, 0, 0.15)',
+                                borderRadius: 20,
+                                paddingHorizontal: 12,
+                                paddingVertical: 8,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                opacity: isControlling ? 0.5 : 1,
+                            }}
+                        >
+                            {controlAction === 'pause' ? (
+                                <ActivityIndicator size="small" color="#FFCC00" />
+                            ) : (
+                                <>
+                                    <Ionicons name="pause" size={16} color="#FFCC00" />
+                                    <Text style={{ color: '#FFCC00', fontSize: 13, fontWeight: '600', marginLeft: 4 }}>
+                                        {t('session.pause')}
+                                    </Text>
+                                </>
+                            )}
+                        </Pressable>
+                    )}
+
+                    {/* Terminate Button */}
+                    <Pressable
+                        testID="session-control-terminate"
+                        onPress={handleTerminate}
+                        disabled={isControlling}
+                        style={{
+                            backgroundColor: theme.dark ? 'rgba(255, 59, 48, 0.2)' : 'rgba(255, 59, 48, 0.15)',
+                            borderRadius: 20,
+                            paddingHorizontal: 12,
+                            paddingVertical: 8,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            opacity: isControlling ? 0.5 : 1,
+                        }}
+                    >
+                        {controlAction === 'terminate' ? (
+                            <ActivityIndicator size="small" color="#FF3B30" />
+                        ) : (
+                            <>
+                                <Ionicons name="stop" size={16} color="#FF3B30" />
+                                <Text style={{ color: '#FF3B30', fontSize: 13, fontWeight: '600', marginLeft: 4 }}>
+                                    {t('session.terminate')}
+                                </Text>
+                            </>
+                        )}
+                    </Pressable>
+
+                    {/* Switch Mode Button - only show in remote mode */}
+                    {session.metadata?.flavor !== 'local' && (
+                        <Pressable
+                            testID="session-control-switch-mode"
+                            onPress={handleSwitchMode}
+                            disabled={isControlling}
+                            style={{
+                                backgroundColor: theme.dark ? 'rgba(88, 86, 214, 0.2)' : 'rgba(88, 86, 214, 0.15)',
+                                borderRadius: 20,
+                                paddingHorizontal: 12,
+                                paddingVertical: 8,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                opacity: isControlling ? 0.5 : 1,
+                            }}
+                        >
+                            {controlAction === 'switch' ? (
+                                <ActivityIndicator size="small" color="#5856D6" />
+                            ) : (
+                                <>
+                                    <Ionicons name="swap-horizontal" size={16} color="#5856D6" />
+                                    <Text style={{ color: '#5856D6', fontSize: 13, fontWeight: '600', marginLeft: 4 }}>
+                                        {t('session.switchMode')}
+                                    </Text>
+                                </>
+                            )}
+                        </Pressable>
+                    )}
+                </View>
+            )}
+
+            {/* Paused Banner - shown when session is paused */}
+            {session.executionState === 'paused' && session.presence === 'online' && (
+                <View
+                    testID="session-paused-banner"
+                    style={{
+                        position: 'absolute',
+                        bottom: safeArea.bottom + 100,
+                        alignSelf: 'center',
+                        backgroundColor: theme.dark ? 'rgba(255, 204, 0, 0.15)' : 'rgba(255, 204, 0, 0.2)',
+                        borderRadius: 20,
+                        paddingHorizontal: 16,
+                        paddingVertical: 10,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        zIndex: 999,
+                    }}
+                >
+                    <Ionicons name="pause-circle" size={20} color="#FFCC00" />
+                    <Text style={{ color: '#FFCC00', fontSize: 14, fontWeight: '600', marginLeft: 8 }}>
+                        {t('session.paused')}
+                    </Text>
+                </View>
             )}
 
             {/* Main content area - no padding since header is overlay */}

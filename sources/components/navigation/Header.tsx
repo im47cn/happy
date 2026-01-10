@@ -89,10 +89,14 @@ interface ExtendedNavigationOptions extends Partial<NativeStackHeaderProps['opti
     headerSubtitleStyle?: any;
 }
 
-// Default back button component
+// Default back button component with 44x44px touch target
 const DefaultBackButton: React.FC<{ tintColor?: string; onPress: () => void }> = ({ tintColor = '#000', onPress }) => {
     return (
-        <Pressable onPress={onPress} hitSlop={15}>
+        <Pressable
+            onPress={onPress}
+            hitSlop={10}
+            style={{ minWidth: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' }}
+        >
             <Ionicons
                 name={Platform.OS === 'ios' ? 'chevron-back' : 'arrow-back'}
                 size={24}
@@ -218,6 +222,9 @@ const stylesheet = StyleSheet.create((theme, runtime) => ({
         flexGrow: 0,
         flexShrink: 0,
         alignItems: 'flex-start',
+        minWidth: 44,
+        minHeight: 44,
+        justifyContent: 'center',
     },
     centerContainer: {
         flexGrow: 1,
@@ -232,6 +239,9 @@ const stylesheet = StyleSheet.create((theme, runtime) => ({
         flexGrow: 0,
         flexShrink: 0,
         alignItems: 'flex-end',
+        minWidth: 44,
+        minHeight: 44,
+        justifyContent: 'center',
     },
     title: {
         fontSize: 17,
