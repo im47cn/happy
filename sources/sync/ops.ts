@@ -117,10 +117,6 @@ interface SessionRipgrepResponse {
 }
 
 // Kill session operation types
-interface SessionKillRequest {
-    // No parameters needed
-}
-
 interface SessionKillResponse {
     success: boolean;
     message: string;
@@ -479,6 +475,107 @@ export async function sessionKill(sessionId: string): Promise<SessionKillRespons
     }
 }
 
+// === Phase 2 Remote Control Operations ===
+
+// Control operation response type
+interface SessionControlResponse {
+    success: boolean;
+    error?: string;
+}
+
+/**
+ * Pause the current session execution
+ * @see phase2-remote-control design document section 2.2
+ */
+export async function sessionPause(sessionId: string): Promise<SessionControlResponse> {
+    try {
+        const response = await apiSocket.sessionRPC<SessionControlResponse, {}>(
+            sessionId,
+            'control.pause',
+            {}
+        );
+        return response;
+    } catch (error) {
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+        };
+    }
+}
+
+/**
+ * Resume the paused session execution
+ * @see phase2-remote-control design document section 2.2
+ */
+export async function sessionResume(sessionId: string): Promise<SessionControlResponse> {
+    try {
+        const response = await apiSocket.sessionRPC<SessionControlResponse, {}>(
+            sessionId,
+            'control.resume',
+            {}
+        );
+        return response;
+    } catch (error) {
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+        };
+    }
+}
+
+/**
+ * Terminate the session gracefully
+ * Unlike sessionKill which terminates immediately, this allows for cleanup
+ * @see phase2-remote-control design document section 2.2
+ */
+export async function sessionTerminate(sessionId: string): Promise<SessionControlResponse> {
+    try {
+        const response = await apiSocket.sessionRPC<SessionControlResponse, {}>(
+            sessionId,
+            'control.terminate',
+            {}
+        );
+        return response;
+    } catch (error) {
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+        };
+    }
+}
+
+/**
+ * Query the current session state
+ * @see phase2-remote-control design document section 2.2
+ */
+export async function sessionQueryState(sessionId: string): Promise<{
+    success: boolean;
+    mode?: string;
+    state?: string;
+    backend?: string;
+    model?: string;
+    error?: string;
+}> {
+    try {
+        const response = await apiSocket.sessionRPC<{
+            mode: string;
+            state: string;
+            backend: string;
+            model?: string;
+        }, {}>(
+            sessionId,
+            'state.query',
+            {}
+        );
+        return { success: true, ...response };
+    } catch (error) {
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+        };
+    }
+}
+
 /**
  * Permanently delete a session from the server
  * This will remove the session and all its associated data (messages, usage reports, access keys)
@@ -491,7 +588,7 @@ export async function sessionDelete(sessionId: string): Promise<{ success: boole
         });
         
         if (response.ok) {
-            const result = await response.json();
+            await response.json(); // Consume response body
             return { success: true };
         } else {
             const error = await response.text();
@@ -519,5 +616,6 @@ export type {
     SessionGetDirectoryTreeResponse,
     TreeNode,
     SessionRipgrepResponse,
-    SessionKillResponse
+    SessionKillResponse,
+    SessionControlResponse
 };

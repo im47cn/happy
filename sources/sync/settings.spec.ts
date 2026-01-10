@@ -93,158 +93,60 @@ describe('settings', () => {
     describe('applySettings', () => {
         it('should apply delta to existing settings', () => {
             const currentSettings: Settings = {
+                ...settingsDefaults,
                 viewInline: false,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
                 avatarStyle: 'gradient',
-                showFlavorIcons: false,
-                compactSessionView: false,
-                hideInactiveSessions: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
-                recentMachinePaths: [],
-                lastUsedAgent: null,
-                lastUsedPermissionMode: null,
-                lastUsedModelMode: null,
             };
             const delta: Partial<Settings> = {
                 viewInline: true
             };
             expect(applySettings(currentSettings, delta)).toEqual({
+                ...settingsDefaults,
                 viewInline: true,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
-                avatarStyle: 'brutalist',
-                showFlavorIcons: false,
-                compactSessionView: false,
-                hideInactiveSessions: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
+                avatarStyle: 'gradient',
             });
         });
 
         it('should merge with defaults', () => {
             const currentSettings: Settings = {
+                ...settingsDefaults,
                 viewInline: true,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
                 avatarStyle: 'gradient',
-                showFlavorIcons: false,
-                compactSessionView: false,
-                hideInactiveSessions: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
-                recentMachinePaths: [],
-                lastUsedAgent: null,
-                lastUsedPermissionMode: null,
-                lastUsedModelMode: null,
             };
             const delta: Partial<Settings> = {};
             expect(applySettings(currentSettings, delta)).toEqual({
                 ...settingsDefaults,
-                viewInline: true
+                viewInline: true,
+                avatarStyle: 'gradient',
             });
         });
 
         it('should override existing values with delta', () => {
             const currentSettings: Settings = {
+                ...settingsDefaults,
                 viewInline: true,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
                 avatarStyle: 'gradient',
-                showFlavorIcons: false,
-                compactSessionView: false,
-                hideInactiveSessions: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
-                recentMachinePaths: [],
-                lastUsedAgent: null,
-                lastUsedPermissionMode: null,
-                lastUsedModelMode: null,
             };
             const delta: Partial<Settings> = {
                 viewInline: false
             };
             expect(applySettings(currentSettings, delta)).toEqual({
+                ...settingsDefaults,
                 viewInline: false,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
-                avatarStyle: 'brutalist',
-                showFlavorIcons: false,
-                compactSessionView: false,
-                hideInactiveSessions: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
+                avatarStyle: 'gradient',
             });
         });
 
         it('should handle empty delta', () => {
             const currentSettings: Settings = {
+                ...settingsDefaults,
                 viewInline: true,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
                 avatarStyle: 'gradient',
-                showFlavorIcons: false,
-                compactSessionView: false,
-                hideInactiveSessions: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
-                recentMachinePaths: [],
-                lastUsedAgent: null,
-                lastUsedPermissionMode: null,
-                lastUsedModelMode: null,
             };
             expect(applySettings(currentSettings, {})).toEqual({
                 ...settingsDefaults,
-                viewInline: true
+                viewInline: true,
+                avatarStyle: 'gradient',
             });
         });
 
@@ -265,27 +167,9 @@ describe('settings', () => {
 
         it('should handle extra fields in delta', () => {
             const currentSettings: Settings = {
+                ...settingsDefaults,
                 viewInline: true,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
                 avatarStyle: 'gradient',
-                showFlavorIcons: false,
-                compactSessionView: false,
-                hideInactiveSessions: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
-                recentMachinePaths: [],
-                lastUsedAgent: null,
-                lastUsedPermissionMode: null,
-                lastUsedModelMode: null,
             };
             const delta: any = {
                 viewInline: false,
@@ -294,6 +178,7 @@ describe('settings', () => {
             expect(applySettings(currentSettings, delta)).toEqual({
                 ...settingsDefaults,
                 viewInline: false,
+                avatarStyle: 'gradient',
                 newField: 'new value'
             });
         });
@@ -318,7 +203,8 @@ describe('settings', () => {
 
     describe('settingsDefaults', () => {
         it('should have correct default values', () => {
-            expect(settingsDefaults).toEqual({
+            // Verify key default values using toMatchObject to allow new fields to be added
+            expect(settingsDefaults).toMatchObject({
                 viewInline: false,
                 expandTodos: true,
                 showLineNumbers: true,

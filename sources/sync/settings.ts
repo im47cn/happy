@@ -29,6 +29,16 @@ export const SettingsSchema = z.object({
     lastUsedAgent: z.string().nullable().describe('Last selected agent type for new sessions'),
     lastUsedPermissionMode: z.string().nullable().describe('Last selected permission mode for new sessions'),
     lastUsedModelMode: z.string().nullable().describe('Last selected model mode for new sessions'),
+
+    // Browser Native Voice I/O Settings (Phase 4)
+    voiceProvider: z.enum(['browser', 'elevenlabs']).describe('Voice provider: browser native or ElevenLabs'),
+    browserVoiceInputEnabled: z.boolean().describe('Enable browser native speech-to-text input'),
+    browserVoiceOutputEnabled: z.boolean().describe('Enable browser native text-to-speech output'),
+    browserRecognitionLanguage: z.string().describe('Language code for speech recognition (BCP 47 format, e.g., zh-CN, en-US)'),
+    browserSpeechRate: z.number().describe('Speech synthesis rate (0.5-2.0)'),
+    browserSpeechPitch: z.number().describe('Speech synthesis pitch (0.5-2.0)'),
+    browserSpeechVolume: z.number().describe('Speech synthesis volume (0-1.0)'),
+    browserSelectedVoice: z.string().nullable().describe('Selected voice name for speech synthesis (null for system default)'),
 });
 
 //
@@ -72,6 +82,16 @@ export const settingsDefaults: Settings = {
     lastUsedAgent: null,
     lastUsedPermissionMode: null,
     lastUsedModelMode: null,
+
+    // Browser Native Voice I/O Settings (Phase 4)
+    voiceProvider: 'elevenlabs',
+    browserVoiceInputEnabled: false,
+    browserVoiceOutputEnabled: false,
+    browserRecognitionLanguage: 'zh-CN',
+    browserSpeechRate: 1.0,
+    browserSpeechPitch: 1.0,
+    browserSpeechVolume: 1.0,
+    browserSelectedVoice: null,
 };
 Object.freeze(settingsDefaults);
 

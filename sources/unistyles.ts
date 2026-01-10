@@ -15,11 +15,10 @@ const appThemes = {
 
 const breakpoints = {
     xs: 0, // <-- make sure to register one breakpoint with value 0
-    sm: 300,
-    md: 500,
-    lg: 800,
-    xl: 1200
-    // use as many breakpoints as you need
+    sm: 375, // 小屏手机 (375-428px)
+    md: 428, // 大屏手机 (428-768px)
+    lg: 768, // 平板/桌面 (768-1200px)
+    xl: 1200 // 大屏桌面 (1200px+)
 };
 
 // Load theme preference from storage
