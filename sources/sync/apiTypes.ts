@@ -42,6 +42,14 @@ export const ApiDeleteSessionSchema = z.object({
     sid: z.string(), // Session ID
 });
 
+/**
+ * Execution state of the AI agent for remote control
+ * @see phase2-remote-control design document section 2.2
+ */
+export const ExecutionStateSchema = z.enum(['idle', 'thinking', 'waiting', 'paused']);
+
+export type ExecutionStateType = z.infer<typeof ExecutionStateSchema>;
+
 export const ApiUpdateSessionStateSchema = z.object({
     t: z.literal('update-session'),
     id: z.string(),
@@ -53,6 +61,16 @@ export const ApiUpdateSessionStateSchema = z.object({
         version: z.number(),
         value: z.string()
     }).nullish(),
+    /**
+     * Current execution state of the AI agent (for remote control)
+     * Used for real-time state synchronization from CLI to mobile
+     */
+    executionState: ExecutionStateSchema.nullish(),
+    /**
+     * Currently executing tool name (when waiting for permission)
+     * Used for displaying pending permission context on mobile
+     */
+    currentTool: z.string().nullish(),
 });
 
 export const ApiUpdateAccountSchema = z.object({
@@ -147,6 +165,43 @@ export const ApiKvBatchUpdateSchema = z.object({
     }))
 });
 
+/**
+ * Fork session event - sent when a session is forked
+ * @see phase5-session-fork design spec section 2.4
+ */
+export const ApiUpdateForkSessionSchema = z.object({
+    t: z.literal('fork-session'),
+    /** New forked session data */
+    session: z.object({
+        id: z.string(),
+        seq: z.number(),
+        metadata: z.string(),
+        metadataVersion: z.number(),
+        agentState: z.string().nullable(),
+        agentStateVersion: z.number(),
+        dataEncryptionKey: z.string().nullable(),
+        active: z.boolean(),
+        activeAt: z.number(),
+        createdAt: z.number(),
+        updatedAt: z.number(),
+        forkedFromSessionId: z.string(),
+        forkPointMessageId: z.string().nullable()
+    }),
+    /** Parent session basic info */
+    forkedFrom: z.object({
+        id: z.string(),
+        tag: z.string(),
+        createdAt: z.number()
+    }),
+    /** Fork point information */
+    forkPoint: z.object({
+        messageId: z.string().nullable(),
+        timestamp: z.number()
+    })
+});
+
+export type ApiUpdateForkSession = z.infer<typeof ApiUpdateForkSessionSchema>;
+
 export const ApiUpdateSchema = z.discriminatedUnion('t', [
     ApiUpdateNewMessageSchema,
     ApiUpdateNewSessionSchema,
@@ -159,7 +214,8 @@ export const ApiUpdateSchema = z.discriminatedUnion('t', [
     ApiDeleteArtifactSchema,
     ApiRelationshipUpdatedSchema,
     ApiNewFeedPostSchema,
-    ApiKvBatchUpdateSchema
+    ApiKvBatchUpdateSchema,
+    ApiUpdateForkSessionSchema
 ]);
 
 export type ApiUpdateNewMessage = z.infer<typeof ApiUpdateNewMessageSchema>;
@@ -190,6 +246,12 @@ export const ApiEphemeralActivityUpdateSchema = z.object({
     active: z.boolean(),
     activeAt: z.number(),
     thinking: z.boolean(),
+    /** Phase 2: Session mode (local/remote) */
+    mode: z.enum(['local', 'remote']).optional(),
+    /** Phase 2: Execution state for remote control */
+    executionState: z.enum(['idle', 'thinking', 'waiting', 'paused']).optional(),
+    /** Phase 2: Current tool being executed */
+    currentTool: z.string().nullable().optional(),
 });
 
 export const ApiEphemeralUsageUpdateSchema = z.object({

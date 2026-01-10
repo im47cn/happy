@@ -48,6 +48,12 @@ export const AgentStateSchema = z.object({
 
 export type AgentState = z.infer<typeof AgentStateSchema>;
 
+/**
+ * Execution state of the AI agent for remote control
+ * @see phase2-remote-control design document section 2.2
+ */
+export type ExecutionState = 'idle' | 'thinking' | 'waiting' | 'paused';
+
 export interface Session {
     id: string,
     seq: number,
@@ -62,6 +68,18 @@ export interface Session {
     thinking: boolean,
     thinkingAt: number,
     presence: "online" | number, // "online" when active, timestamp when last seen
+    /**
+     * Current execution state of the AI agent (for remote control)
+     * - idle: Ready for input, not processing
+     * - thinking: AI is processing/generating
+     * - waiting: Waiting for permission approval
+     * - paused: Session is paused by user
+     */
+    executionState?: ExecutionState,
+    /**
+     * Currently executing tool name (when waiting for permission)
+     */
+    currentTool?: string | null,
     todos?: Array<{
         content: string;
         status: 'pending' | 'in_progress' | 'completed';
@@ -82,6 +100,21 @@ export interface Session {
         contextSize: number;
         timestamp: number;
     } | null;
+
+    // Phase 5: Session Fork fields
+    // @see phase5-session-fork design spec
+    /**
+     * ID of the parent session this was forked from (null for original sessions)
+     */
+    forkedFromSessionId?: string | null;
+    /**
+     * Message ID where the fork occurred (null if forked at session start)
+     */
+    forkPointMessageId?: string | null;
+    /**
+     * Number of child forks created from this session
+     */
+    forkCount?: number;
 }
 
 export interface DecryptedMessage {

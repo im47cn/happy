@@ -491,6 +491,10 @@ class Sync {
             createdAt: number;
             updatedAt: number;
             lastMessage: ApiMessage | null;
+            // Phase 5: Fork fields
+            forkedFromSessionId?: string | null;
+            forkPointMessageId?: string | null;
+            forkCount?: number;
         }>;
 
         // Initialize all session encryptions first
@@ -1887,6 +1891,92 @@ class Sync {
                         this.todosSync.invalidate();
                     }
                 }
+            }
+        } else if (updateData.body.t === 'fork-session') {
+            // Phase 5: Handle fork-session events
+            // @see phase5-session-fork design spec section 2.4
+            log.log('🍴 Received fork-session update');
+            const forkUpdate = updateData.body;
+            const forkedSession = forkUpdate.session;
+
+            try {
+                // 1. Decrypt the data encryption key for the forked session
+                if (!forkedSession.dataEncryptionKey) {
+                    console.error(`Fork session ${forkedSession.id} has no encryption key`);
+                    this.sessionsSync.invalidate(); // Fallback to full refresh
+                    return;
+                }
+
+                const decryptedKey = await this.encryption.decryptEncryptionKey(forkedSession.dataEncryptionKey);
+                if (!decryptedKey) {
+                    console.error(`Failed to decrypt encryption key for fork session ${forkedSession.id}`);
+                    this.sessionsSync.invalidate();
+                    return;
+                }
+
+                // 2. Initialize encryption for the forked session
+                const sessionKeys = new Map<string, Uint8Array | null>();
+                sessionKeys.set(forkedSession.id, decryptedKey);
+                await this.encryption.initializeSessions(sessionKeys);
+
+                // 3. Get session encryption and decrypt metadata/agentState
+                const sessionEncryption = this.encryption.getSessionEncryption(forkedSession.id);
+                if (!sessionEncryption) {
+                    console.error(`Session encryption not found for fork ${forkedSession.id}`);
+                    this.sessionsSync.invalidate();
+                    return;
+                }
+
+                // Decrypt metadata
+                const metadata = forkedSession.metadata
+                    ? await sessionEncryption.decryptMetadata(forkedSession.metadataVersion, forkedSession.metadata)
+                    : null;
+
+                // Decrypt agentState
+                const agentState = forkedSession.agentState
+                    ? await sessionEncryption.decryptAgentState(forkedSession.agentStateVersion, forkedSession.agentState)
+                    : null;
+
+                // 4. Create Session object for the forked session
+                const newSession: Omit<Session, 'presence'> & { presence?: 'online' | number } = {
+                    id: forkedSession.id,
+                    seq: forkedSession.seq,
+                    createdAt: forkedSession.createdAt,
+                    updatedAt: forkedSession.updatedAt,
+                    active: forkedSession.active,
+                    activeAt: forkedSession.activeAt,
+                    metadata,
+                    metadataVersion: forkedSession.metadataVersion,
+                    agentState,
+                    agentStateVersion: forkedSession.agentStateVersion,
+                    thinking: false,
+                    thinkingAt: 0,
+                    presence: forkedSession.active ? 'online' : forkedSession.activeAt,
+                    // Phase 5 fork fields
+                    forkedFromSessionId: forkedSession.forkedFromSessionId,
+                    forkPointMessageId: forkedSession.forkPointMessageId,
+                    forkCount: 0
+                };
+
+                // 5. Apply the forked session to storage
+                this.applySessions([newSession]);
+                log.log(`🍴 Fork session ${forkedSession.id} added (forked from ${forkedSession.forkedFromSessionId})`);
+
+                // 6. Update parent session's forkCount if present in local storage
+                const parentSession = storage.getState().sessions[forkedSession.forkedFromSessionId];
+                if (parentSession) {
+                    const updatedParent = {
+                        ...parentSession,
+                        forkCount: (parentSession.forkCount ?? 0) + 1
+                    };
+                    this.applySessions([updatedParent]);
+                    log.log(`🍴 Updated parent session ${forkedSession.forkedFromSessionId} forkCount to ${updatedParent.forkCount}`);
+                }
+
+            } catch (error) {
+                console.error('Failed to process fork-session update:', error);
+                // Fallback to full session refresh
+                this.sessionsSync.invalidate();
             }
         }
     }
