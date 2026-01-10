@@ -159,6 +159,7 @@
     "@stablelib/hex": "^2.0.1",
     "@types/react": "~19.1.10",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "jsdom": "^27.4.0",
     "patch-package": "^8.0.0",
     "react-test-renderer": "19.0.0",
     "tsx": "^4.20.4",
