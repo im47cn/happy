@@ -59,6 +59,8 @@ export const zhHans: TranslationStructure = {
         fileViewer: '文件查看器',
         loading: '加载中...',
         retry: '重试',
+        delete: '删除',
+        edit: '编辑',
     },
 
     profile: {
@@ -112,6 +114,8 @@ export const zhHans: TranslationStructure = {
         voiceAssistantSubtitle: '配置语音交互偏好',
         featuresTitle: '功能',
         featuresSubtitle: '启用或禁用应用功能',
+        notifications: '通知',
+        notificationsSubtitle: '管理推送通知设置',
         developer: '开发者',
         developerTools: '开发者工具',
         about: '关于',
@@ -200,6 +204,57 @@ export const zhHans: TranslationStructure = {
         hideInactiveSessionsSubtitle: '仅在列表中显示活跃的聊天',
     },
 
+    settingsNotifications: {
+        // Push notification settings screen
+        title: '通知',
+        subtitle: '管理推送通知设置',
+        webPush: '推送通知',
+        webPushDescription: '即使在应用关闭时也能收到通知。仅在支持推送通知的网络浏览器中可用。',
+
+        // Status messages
+        notSupported: '不支持',
+        notSupportedDescription: '您的浏览器不支持推送通知',
+        permissionDenied: '权限被拒绝',
+        permissionDeniedDescription: '推送通知已被阻止。请在浏览器设置中启用。',
+        permissionRequired: '需要权限',
+        permissionRequiredDescription: '点击允许推送通知',
+        subscribed: '已订阅',
+        subscribedDescription: '您将收到推送通知',
+        unsubscribed: '已禁用',
+        unsubscribedDescription: '推送通知已关闭',
+
+        // Actions
+        enableNotifications: '启用通知',
+        disableNotifications: '禁用通知',
+        requestPermission: '允许通知',
+
+        // Notification types
+        notificationTypes: '通知类型',
+        notificationTypesDescription: '选择您想要接收的通知类型',
+        approvalRequest: '审批请求',
+        approvalRequestDescription: '当操作需要您的审批时通知您',
+        taskComplete: '任务完成',
+        taskCompleteDescription: '当后台任务完成时通知您',
+        newMessage: '新消息',
+        newMessageDescription: '当您收到新消息时通知您',
+        systemNotification: '系统提醒',
+        systemNotificationDescription: '重要的系统更新和提醒',
+
+        // Device info
+        deviceInfo: '设备信息',
+        deviceId: '设备 ID',
+
+        // Errors
+        subscriptionFailed: '订阅通知失败',
+        unsubscriptionFailed: '取消订阅通知失败',
+        updatePreferencesFailed: '更新通知偏好失败',
+
+        // Test notifications
+        testNotification: '发送测试通知',
+        testNotificationSent: '测试通知已发送',
+        testNotificationFailed: '发送测试通知失败',
+    },
+
     errors: {
         networkError: '发生网络错误',
         serverError: '发生服务器错误',
@@ -245,6 +300,12 @@ export const zhHans: TranslationStructure = {
         failedToRemoveFriend: '删除好友失败',
         searchFailed: '搜索失败。请重试。',
         failedToSendRequest: '发送好友请求失败',
+        // Phase 2: Remote control errors
+        controlFailed: '控制操作失败',
+        pauseFailed: '暂停会话失败',
+        resumeFailed: '恢复会话失败',
+        terminateFailed: '终止会话失败',
+        switchModeFailed: '切换模式失败',
     },
 
     newSession: {
@@ -291,6 +352,29 @@ export const zhHans: TranslationStructure = {
 
     session: {
         inputPlaceholder: '输入消息...',
+        // Phase 2: Remote control
+        pause: '暂停',
+        resume: '恢复',
+        paused: '已暂停',
+        terminate: '终止',
+        terminateTitle: '终止会话',
+        terminateConfirm: '确定要终止此会话吗？此操作无法撤销。',
+        switchMode: '切换模式',
+        switchModeTitle: '切换会话模式',
+        switchModeConfirm: ({ mode }: { mode: string }) => `切换会话到 ${mode} 模式？`,
+        localModeBanner: '本地模式 - CLI 控制中',
+    },
+
+    // Phase 2: Approvals page
+    approvals: {
+        title: '待审批',
+        empty: '没有待审批项',
+        emptyDescription: 'CLI 会话的权限请求将显示在这里',
+        waitingForApproval: '等待您的审批',
+        permissionRequest: '权限请求',
+        expiresIn: ({ minutes }: { minutes: number }) => `${minutes} 分钟后过期`,
+        expired: '已过期',
+        viewSession: '查看会话',
     },
 
     commandPalette: {
@@ -366,6 +450,44 @@ export const zhHans: TranslationStructure = {
         failedToDeleteSession: '删除会话失败',
         sessionDeleted: '会话删除成功',
         
+    },
+
+    sessionsList: {
+        // Used by SessionsList component (app/(app)/(tabs)/sessions.tsx)
+        searchPlaceholder: '搜索会话...',
+        filterBackend: {
+            all: '全部',
+            claude: 'Claude',
+            codex: 'Codex',
+            gemini: 'Gemini',
+        },
+        filterStatus: {
+            all: '全部状态',
+            active: '活跃',
+            paused: '已暂停',
+            offline: '离线',
+        },
+        clearFilters: '清除筛选',
+        menu: {
+            rename: '重命名',
+            delete: '删除',
+            viewDetail: '查看详情',
+        },
+        rename: {
+            title: '重命名会话',
+            placeholder: '输入会话名称...',
+        },
+        delete: {
+            title: '删除会话',
+            confirm: '确定要删除此会话吗？此操作无法撤销。',
+        },
+        empty: {
+            title: '暂无会话',
+            description: '连接 CLI 开始使用',
+            filteredTitle: '没有匹配的会话',
+            filteredDescription: '尝试调整筛选条件',
+        },
+        noResults: '没有匹配的会话',
     },
 
     components: {
@@ -720,6 +842,35 @@ export const zhHans: TranslationStructure = {
         unknownEvent: '未知事件',
         usageLimitUntil: ({ time }: { time: string }) => `使用限制到 ${time}`,
         unknownTime: '未知时间',
+        // MessageStream detail modal
+        details: '消息详情',
+        id: '消息 ID',
+        timestamp: '时间戳',
+        type: '类型',
+        encryption: '加密状态',
+        encrypted: '已加密',
+        unencrypted: '未加密',
+        localId: '本地 ID',
+    },
+
+    commandQueue: {
+        // Command Queue Management
+        title: '命令队列',
+        empty: '队列为空',
+        emptyDescription: 'AI 忙碌时排队的命令将在这里显示',
+        count: ({ count }: { count: number }) => `${count} 条命令在队列中`,
+        clear: '清空',
+        clearTitle: '清空队列',
+        clearConfirm: '确定要清空所有排队的命令吗？',
+        deleteTitle: '删除命令',
+        deleteConfirm: '确定要删除这条命令吗？',
+        editPlaceholder: '编辑命令...',
+        status: {
+            pending: '等待中',
+            sending: '发送中',
+            sent: '已发送',
+            failed: '失败',
+        },
     },
 
     codex: {
@@ -855,5 +1006,157 @@ export const zhHans: TranslationStructure = {
         friendRequestGeneric: '新的好友请求',
         friendAccepted: ({ name }: { name: string }) => `您现在与 ${name} 成为了好友`,
         friendAcceptedGeneric: '好友请求已接受',
-    }
+    },
+
+    voice: {
+        // Browser Native Voice I/O (Phase 4)
+        // Browser capability messages
+        browser: {
+            notWebPlatform: '语音功能仅在 Web 平台可用',
+            outdatedBrowser: '请更新您的浏览器以使用语音功能',
+            notSupported: '您的浏览器不支持语音功能',
+        },
+
+        // Voice error messages
+        errors: {
+            browserNotSupported: {
+                title: '浏览器不支持',
+                message: '您的浏览器不支持语音识别。请使用 Chrome、Edge 或 Safari。',
+                suggestion: '尝试切换到 Chrome 或 Edge 等受支持的浏览器。',
+            },
+            microphonePermissionDenied: {
+                title: '麦克风访问被拒绝',
+                message: '麦克风权限被拒绝。语音输入需要麦克风访问权限。',
+                suggestion: '请在浏览器设置中启用麦克风访问权限。',
+            },
+            networkError: {
+                title: '网络错误',
+                message: '语音识别过程中发生网络错误。',
+                suggestion: '请检查您的网络连接并重试。',
+            },
+            noSpeechDetected: {
+                title: '未检测到语音',
+                message: '未检测到语音。请对着麦克风清晰地说话。',
+                suggestion: '尝试说话更大声或靠近麦克风。',
+            },
+            languageNotSupported: {
+                title: '语言不支持',
+                message: '您的浏览器不支持所选语言。',
+                suggestion: '请尝试在语音设置中选择其他语言。',
+            },
+            synthesisError: {
+                title: '语音合成错误',
+                message: '生成语音输出时发生错误。',
+                suggestion: '请重试或选择其他语音。',
+            },
+            recognitionAborted: {
+                title: '识别已停止',
+                message: '语音识别已停止。',
+                suggestion: '按麦克风按钮重新开始。',
+            },
+            audioCaptureError: {
+                title: '音频捕获失败',
+                message: '无法从麦克风捕获音频。',
+                suggestion: '检查是否有其他应用程序正在使用麦克风。',
+            },
+            serviceUnavailable: {
+                title: '服务不可用',
+                message: '语音识别服务暂时不可用。',
+                suggestion: '请稍等片刻后重试。',
+            },
+            unknown: {
+                title: '未知错误',
+                message: '语音功能发生意外错误。',
+                suggestion: '请重试。如果问题仍然存在，请刷新页面。',
+            },
+        },
+
+        // Voice controls
+        controls: {
+            startListening: '开始听取',
+            stopListening: '停止听取',
+            startSpeaking: '朗读',
+            stopSpeaking: '停止朗读',
+            listening: '正在听取...',
+            speaking: '正在朗读...',
+            processing: '处理中...',
+        },
+
+        // Voice settings
+        settings: {
+            title: '语音设置',
+            provider: '语音提供商',
+            providerDescription: '选择您喜欢的语音提供商',
+            providerBrowser: '浏览器原生',
+            providerElevenLabs: 'ElevenLabs',
+            input: '语音输入',
+            inputDescription: '启用语音转文字功能进行语音命令',
+            inputEnabled: '语音输入已启用',
+            inputDisabled: '语音输入已禁用',
+            output: '语音输出',
+            outputDescription: '启用文字转语音功能进行响应',
+            outputEnabled: '语音输出已启用',
+            outputDisabled: '语音输出已禁用',
+            recognitionLanguage: '识别语言',
+            recognitionLanguageDescription: '语音识别使用的语言',
+            recognitionLanguageFooter: ({ count }: { count: number }) => `${count} 种语言可用`,
+            speechRate: '语速',
+            speechRateDescription: '调整语音输出的速度',
+            speechPitch: '音调',
+            speechPitchDescription: '调整语音输出的音调',
+            speechVolume: '音量',
+            speechVolumeDescription: '调整语音输出的音量',
+            selectedVoice: '语音',
+            selectedVoiceDescription: '选择语音输出的声音',
+            systemDefault: '系统默认',
+            testVoice: '测试语音',
+            testVoiceText: '这是文字转语音功能的测试。',
+            browserNotSupported: '浏览器语音功能不支持',
+            browserNotSupportedDescription: '您的浏览器不支持 Web Speech API。请使用 Chrome、Edge 或 Safari。',
+        },
+    },
+
+    pwa: {
+        install: {
+            title: '安装 Happy Coder',
+            message: '安装 Happy Coder 以获得更好的离线访问和推送通知体验。',
+            installButton: '安装',
+            notNow: '稍后',
+            installed: '应用已安装',
+            installedMessage: 'Happy Coder 已安装。您现在可以从主屏幕访问它。',
+        },
+        offline: {
+            title: '您已离线',
+            message: '离线时某些功能可能受限。',
+            reconnecting: '正在重新连接...',
+            reconnected: '已恢复在线',
+        },
+        update: {
+            title: '有可用更新',
+            message: 'Happy Coder 有新版本可用。',
+            updateButton: '立即更新',
+            later: '稍后',
+        },
+        notifications: {
+            title: '推送通知',
+            description: '接收审批请求和更新的通知。',
+            enable: '启用通知',
+            disable: '禁用通知',
+            permissionDenied: '通知已被阻止',
+            permissionDeniedMessage: '请在浏览器设置中启用通知。',
+            subscribed: '通知已启用',
+            unsubscribed: '通知已禁用',
+            preferences: '通知偏好设置',
+            approvalRequests: '审批请求',
+            approvalRequestsDescription: '当有人请求您审批时收到通知',
+            taskComplete: '任务完成',
+            taskCompleteDescription: '任务完成时收到通知',
+            newMessage: '新消息',
+            newMessageDescription: '收到新消息时获得通知',
+            systemAnnouncements: '系统公告',
+            systemAnnouncementsDescription: '重要更新和公告',
+            muteAll: '全部静音',
+            muteAllDescription: '暂时禁用所有通知',
+        },
+    },
 } as const;

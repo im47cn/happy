@@ -57,6 +57,8 @@ export const en = {
         fileViewer: 'File Viewer',
         loading: 'Loading...',
         retry: 'Retry',
+        delete: 'Delete',
+        edit: 'Edit',
     },
 
     profile: {
@@ -110,6 +112,8 @@ export const en = {
         voiceAssistantSubtitle: 'Configure voice interaction preferences',
         featuresTitle: 'Features',
         featuresSubtitle: 'Enable or disable app features',
+        notifications: 'Notifications',
+        notificationsSubtitle: 'Manage push notification settings',
         developer: 'Developer',
         developerTools: 'Developer Tools',
         about: 'About',
@@ -198,6 +202,57 @@ export const en = {
         hideInactiveSessionsSubtitle: 'Show only active chats in your list',
     },
 
+    settingsNotifications: {
+        // Push notification settings screen
+        title: 'Notifications',
+        subtitle: 'Manage push notification settings',
+        webPush: 'Push Notifications',
+        webPushDescription: 'Receive notifications even when the app is closed. Only available in web browsers that support push notifications.',
+
+        // Status messages
+        notSupported: 'Not Supported',
+        notSupportedDescription: 'Your browser does not support push notifications',
+        permissionDenied: 'Permission Denied',
+        permissionDeniedDescription: 'Push notifications are blocked. Please enable them in your browser settings.',
+        permissionRequired: 'Permission Required',
+        permissionRequiredDescription: 'Tap to allow push notifications',
+        subscribed: 'Subscribed',
+        subscribedDescription: 'You will receive push notifications',
+        unsubscribed: 'Disabled',
+        unsubscribedDescription: 'Push notifications are turned off',
+
+        // Actions
+        enableNotifications: 'Enable Notifications',
+        disableNotifications: 'Disable Notifications',
+        requestPermission: 'Allow Notifications',
+
+        // Notification types
+        notificationTypes: 'Notification Types',
+        notificationTypesDescription: 'Choose which types of notifications you want to receive',
+        approvalRequest: 'Approval Requests',
+        approvalRequestDescription: 'Get notified when actions require your approval',
+        taskComplete: 'Task Completion',
+        taskCompleteDescription: 'Get notified when background tasks complete',
+        newMessage: 'New Messages',
+        newMessageDescription: 'Get notified when you receive new messages',
+        systemNotification: 'System Alerts',
+        systemNotificationDescription: 'Important system updates and alerts',
+
+        // Device info
+        deviceInfo: 'Device Information',
+        deviceId: 'Device ID',
+
+        // Errors
+        subscriptionFailed: 'Failed to subscribe to notifications',
+        unsubscriptionFailed: 'Failed to unsubscribe from notifications',
+        updatePreferencesFailed: 'Failed to update notification preferences',
+
+        // Test notifications
+        testNotification: 'Send test notification',
+        testNotificationSent: 'Test notification sent',
+        testNotificationFailed: 'Failed to send test notification',
+    },
+
     errors: {
         networkError: 'Network error occurred',
         serverError: 'Server error occurred',
@@ -243,6 +298,12 @@ export const en = {
         failedToRemoveFriend: 'Failed to remove friend',
         searchFailed: 'Search failed. Please try again.',
         failedToSendRequest: 'Failed to send friend request',
+        // Phase 2: Remote control errors
+        controlFailed: 'Control operation failed',
+        pauseFailed: 'Failed to pause session',
+        resumeFailed: 'Failed to resume session',
+        terminateFailed: 'Failed to terminate session',
+        switchModeFailed: 'Failed to switch mode',
     },
 
     newSession: {
@@ -289,6 +350,29 @@ export const en = {
 
     session: {
         inputPlaceholder: 'Type a message ...',
+        // Phase 2: Remote control
+        pause: 'Pause',
+        resume: 'Resume',
+        paused: 'Paused',
+        terminate: 'Terminate',
+        terminateTitle: 'Terminate Session',
+        terminateConfirm: 'Are you sure you want to terminate this session? This action cannot be undone.',
+        switchMode: 'Switch Mode',
+        switchModeTitle: 'Switch Session Mode',
+        switchModeConfirm: ({ mode }: { mode: string }) => `Switch session to ${mode} mode?`,
+        localModeBanner: 'Local mode - CLI has control',
+    },
+
+    // Phase 2: Approvals page
+    approvals: {
+        title: 'Pending Approvals',
+        empty: 'No pending approvals',
+        emptyDescription: 'Permission requests from your CLI sessions will appear here',
+        waitingForApproval: 'Waiting for your approval',
+        permissionRequest: 'Permission Request',
+        expiresIn: ({ minutes }: { minutes: number }) => `Expires in ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`,
+        expired: 'Expired',
+        viewSession: 'View Session',
     },
 
     commandPalette: {
@@ -363,7 +447,45 @@ export const en = {
         deleteSessionWarning: 'This action cannot be undone. All messages and data associated with this session will be permanently deleted.',
         failedToDeleteSession: 'Failed to delete session',
         sessionDeleted: 'Session deleted successfully',
-        
+
+    },
+
+    // Used by SessionsList component (sources/components/SessionsList.tsx)
+    sessionsList: {
+        searchPlaceholder: 'Search sessions...',
+        filterBackend: {
+            all: 'All Backends',
+            claude: 'Claude',
+            codex: 'Codex',
+            gemini: 'Gemini',
+        },
+        filterStatus: {
+            all: 'All Status',
+            active: 'Active',
+            paused: 'Paused',
+            offline: 'Offline',
+        },
+        clearFilters: 'Clear Filters',
+        menu: {
+            rename: 'Rename',
+            delete: 'Delete',
+            viewDetail: 'View Details',
+        },
+        rename: {
+            title: 'Rename Session',
+            placeholder: 'Enter session name...',
+        },
+        delete: {
+            title: 'Delete Session',
+            confirm: 'Are you sure you want to delete this session? This action cannot be undone.',
+        },
+        empty: {
+            title: 'No Sessions',
+            description: 'Connect a CLI to get started',
+            filteredTitle: 'No Matching Sessions',
+            filteredDescription: 'Try adjusting your filters',
+        },
+        noResults: 'No sessions match your search',
     },
 
     components: {
@@ -718,6 +840,35 @@ export const en = {
         unknownEvent: 'Unknown event',
         usageLimitUntil: ({ time }: { time: string }) => `Usage limit reached until ${time}`,
         unknownTime: 'unknown time',
+        // MessageStream detail modal
+        details: 'Message Details',
+        id: 'Message ID',
+        timestamp: 'Timestamp',
+        type: 'Type',
+        encryption: 'Encryption',
+        encrypted: 'Encrypted',
+        unencrypted: 'Unencrypted',
+        localId: 'Local ID',
+    },
+
+    commandQueue: {
+        // Command Queue Management
+        title: 'Command Queue',
+        empty: 'Queue is empty',
+        emptyDescription: 'Commands will appear here when you queue them while AI is busy',
+        count: ({ count }: { count: number }) => `${count} command${count !== 1 ? 's' : ''} in queue`,
+        clear: 'Clear All',
+        clearTitle: 'Clear Queue',
+        clearConfirm: 'Are you sure you want to clear all queued commands?',
+        deleteTitle: 'Delete Command',
+        deleteConfirm: 'Are you sure you want to delete this command?',
+        editPlaceholder: 'Edit your command...',
+        status: {
+            pending: 'Pending',
+            sending: 'Sending',
+            sent: 'Sent',
+            failed: 'Failed',
+        },
     },
 
     codex: {
@@ -854,10 +1005,174 @@ export const en = {
         friendRequestGeneric: 'New friend request',
         friendAccepted: ({ name }: { name: string }) => `You are now friends with ${name}`,
         friendAcceptedGeneric: 'Friend request accepted',
-    }
+    },
+
+    voice: {
+        // Browser Native Voice I/O (Phase 4)
+        // Browser capability messages
+        browser: {
+            notWebPlatform: 'Voice features are only available on web platform',
+            outdatedBrowser: 'Please update your browser to use voice features',
+            notSupported: 'Your browser does not support voice features',
+        },
+
+        // Voice error messages
+        errors: {
+            browserNotSupported: {
+                title: 'Browser Not Supported',
+                message: 'Your browser does not support speech recognition. Please use Chrome, Edge, or Safari.',
+                suggestion: 'Try switching to a supported browser like Chrome or Edge.',
+            },
+            microphonePermissionDenied: {
+                title: 'Microphone Access Denied',
+                message: 'Microphone permission was denied. Voice input requires microphone access.',
+                suggestion: 'Please enable microphone access in your browser settings.',
+            },
+            networkError: {
+                title: 'Network Error',
+                message: 'A network error occurred during speech recognition.',
+                suggestion: 'Please check your internet connection and try again.',
+            },
+            noSpeechDetected: {
+                title: 'No Speech Detected',
+                message: 'No speech was detected. Please speak clearly into the microphone.',
+                suggestion: 'Try speaking louder or moving closer to the microphone.',
+            },
+            languageNotSupported: {
+                title: 'Language Not Supported',
+                message: 'The selected language is not supported by your browser.',
+                suggestion: 'Please try selecting a different language in voice settings.',
+            },
+            synthesisError: {
+                title: 'Speech Synthesis Error',
+                message: 'An error occurred while generating speech output.',
+                suggestion: 'Please try again or select a different voice.',
+            },
+            recognitionAborted: {
+                title: 'Recognition Stopped',
+                message: 'Speech recognition was stopped.',
+                suggestion: 'Press the microphone button to start again.',
+            },
+            audioCaptureError: {
+                title: 'Audio Capture Failed',
+                message: 'Failed to capture audio from microphone.',
+                suggestion: 'Check if another application is using the microphone.',
+            },
+            serviceUnavailable: {
+                title: 'Service Unavailable',
+                message: 'The speech recognition service is temporarily unavailable.',
+                suggestion: 'Please wait a moment and try again.',
+            },
+            unknown: {
+                title: 'Unknown Error',
+                message: 'An unexpected error occurred with voice features.',
+                suggestion: 'Please try again. If the problem persists, refresh the page.',
+            },
+        },
+
+        // Voice controls
+        controls: {
+            startListening: 'Start listening',
+            stopListening: 'Stop listening',
+            startSpeaking: 'Read aloud',
+            stopSpeaking: 'Stop reading',
+            listening: 'Listening...',
+            speaking: 'Speaking...',
+            processing: 'Processing...',
+        },
+
+        // Voice settings
+        settings: {
+            title: 'Voice Settings',
+            provider: 'Voice Provider',
+            providerDescription: 'Choose your preferred voice provider',
+            providerBrowser: 'Browser Native',
+            providerElevenLabs: 'ElevenLabs',
+            input: 'Voice Input',
+            inputDescription: 'Enable speech-to-text for voice commands',
+            inputEnabled: 'Voice input enabled',
+            inputDisabled: 'Voice input disabled',
+            output: 'Voice Output',
+            outputDescription: 'Enable text-to-speech for responses',
+            outputEnabled: 'Voice output enabled',
+            outputDisabled: 'Voice output disabled',
+            recognitionLanguage: 'Recognition Language',
+            recognitionLanguageDescription: 'Language for speech recognition',
+            recognitionLanguageFooter: ({ count }: { count: number }) => `${count} languages available`,
+            speechRate: 'Speech Rate',
+            speechRateDescription: 'Adjust the speed of voice output',
+            speechPitch: 'Speech Pitch',
+            speechPitchDescription: 'Adjust the pitch of voice output',
+            speechVolume: 'Speech Volume',
+            speechVolumeDescription: 'Adjust the volume of voice output',
+            selectedVoice: 'Voice',
+            selectedVoiceDescription: 'Choose a voice for speech output',
+            systemDefault: 'System Default',
+            testVoice: 'Test Voice',
+            testVoiceText: 'This is a test of the text-to-speech voice.',
+            browserNotSupported: 'Browser voice features are not supported',
+            browserNotSupportedDescription: 'Your browser does not support the Web Speech API. Please use Chrome, Edge, or Safari.',
+        },
+    },
+
+    pwa: {
+        install: {
+            title: 'Install Happy Coder',
+            message: 'Install Happy Coder for a better experience with offline access and push notifications.',
+            installButton: 'Install',
+            notNow: 'Not Now',
+            installed: 'App Installed',
+            installedMessage: 'Happy Coder has been installed. You can now access it from your home screen.',
+        },
+        offline: {
+            title: 'You are offline',
+            message: 'Some features may be limited while offline.',
+            reconnecting: 'Reconnecting...',
+            reconnected: 'Back online',
+        },
+        update: {
+            title: 'Update Available',
+            message: 'A new version of Happy Coder is available.',
+            updateButton: 'Update Now',
+            later: 'Later',
+        },
+        notifications: {
+            title: 'Push Notifications',
+            description: 'Get notified about approval requests and updates.',
+            enable: 'Enable Notifications',
+            disable: 'Disable Notifications',
+            permissionDenied: 'Notifications are blocked',
+            permissionDeniedMessage: 'Please enable notifications in your browser settings.',
+            subscribed: 'Notifications enabled',
+            unsubscribed: 'Notifications disabled',
+            preferences: 'Notification Preferences',
+            approvalRequests: 'Approval Requests',
+            approvalRequestsDescription: 'Get notified when someone requests your approval',
+            taskComplete: 'Task Complete',
+            taskCompleteDescription: 'Get notified when tasks are completed',
+            newMessage: 'New Messages',
+            newMessageDescription: 'Get notified about new messages',
+            systemAnnouncements: 'System Announcements',
+            systemAnnouncementsDescription: 'Important updates and announcements',
+            muteAll: 'Mute All',
+            muteAllDescription: 'Temporarily disable all notifications',
+        },
+    },
 } as const;
 
 export type Translations = typeof en;
+
+/**
+ * Helper type to recursively convert string literals to string type
+ * Preserves functions and handles nested objects up to 4 levels deep
+ */
+type DeepStringify<T> = T extends string
+    ? string
+    : T extends (...args: any[]) => string
+        ? T
+        : T extends object
+            ? { readonly [K in keyof T]: DeepStringify<T[K]> }
+            : T;
 
 /**
  * Generic translation type that matches the structure of Translations
@@ -865,16 +1180,6 @@ export type Translations = typeof en;
  */
 export type TranslationStructure = {
     readonly [K in keyof Translations]: {
-        readonly [P in keyof Translations[K]]: Translations[K][P] extends string 
-            ? string 
-            : Translations[K][P] extends (...args: any[]) => string 
-                ? Translations[K][P] 
-                : Translations[K][P] extends object
-                    ? {
-                        readonly [Q in keyof Translations[K][P]]: Translations[K][P][Q] extends string
-                            ? string
-                            : Translations[K][P][Q]
-                      }
-                    : Translations[K][P]
+        readonly [P in keyof Translations[K]]: DeepStringify<Translations[K][P]>
     }
 };

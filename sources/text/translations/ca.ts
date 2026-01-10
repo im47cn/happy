@@ -57,6 +57,8 @@ export const ca: TranslationStructure = {
         fileViewer: 'Visualitzador de fitxers',
         loading: 'Carregant...',
         retry: 'Torna-ho a provar',
+        delete: 'Elimina',
+        edit: 'Edita',
     },
 
     profile: {
@@ -110,6 +112,8 @@ export const ca: TranslationStructure = {
         voiceAssistantSubtitle: 'Configura les preferències d\'interacció per veu',
         featuresTitle: 'Funcions',
         featuresSubtitle: 'Activa o desactiva les funcions de l\'aplicació',
+        notifications: 'Notificacions',
+        notificationsSubtitle: 'Gestiona la configuració de les notificacions push',
         developer: 'Desenvolupador',
         developerTools: 'Eines de desenvolupador',
         about: 'Quant a',
@@ -243,6 +247,12 @@ export const ca: TranslationStructure = {
         failedToRemoveFriend: 'No s\'ha pogut eliminar l\'amic',
         searchFailed: 'La cerca ha fallat. Si us plau, torna-ho a provar.',
         failedToSendRequest: 'No s\'ha pogut enviar la sol·licitud d\'amistat',
+        // Phase 2: Remote control errors
+        controlFailed: 'L\'operació de control ha fallat',
+        pauseFailed: 'No s\'ha pogut pausar la sessió',
+        resumeFailed: 'No s\'ha pogut reprendre la sessió',
+        terminateFailed: 'No s\'ha pogut finalitzar la sessió',
+        switchModeFailed: 'No s\'ha pogut canviar el mode',
     },
 
     newSession: {
@@ -289,6 +299,29 @@ export const ca: TranslationStructure = {
 
     session: {
         inputPlaceholder: 'Escriu un missatge...',
+        // Phase 2: Remote control
+        pause: 'Pausa',
+        resume: 'Reprèn',
+        paused: 'Pausat',
+        terminate: 'Finalitza',
+        terminateTitle: 'Finalitza la sessió',
+        terminateConfirm: 'Segur que vols finalitzar aquesta sessió? Aquesta acció no es pot desfer.',
+        switchMode: 'Canvia el mode',
+        switchModeTitle: 'Canvia el mode de sessió',
+        switchModeConfirm: ({ mode }: { mode: string }) => `Canviar la sessió al mode ${mode}?`,
+        localModeBanner: 'Mode local - CLI té el control',
+    },
+
+    // Phase 2: Approvals page
+    approvals: {
+        title: 'Aprovacions pendents',
+        empty: 'No hi ha aprovacions pendents',
+        emptyDescription: 'Les sol·licituds de permisos de les teves sessions CLI apareixeran aquí',
+        waitingForApproval: 'Esperant la teva aprovació',
+        permissionRequest: 'Sol·licitud de permís',
+        expiresIn: ({ minutes }: { minutes: number }) => `Caduca en ${minutes} ${minutes === 1 ? 'minut' : 'minuts'}`,
+        expired: 'Caducat',
+        viewSession: 'Veure sessió',
     },
 
     commandPalette: {
@@ -364,6 +397,44 @@ export const ca: TranslationStructure = {
         failedToDeleteSession: 'Error en eliminar la sessió',
         sessionDeleted: 'Sessió eliminada amb èxit',
         
+    },
+
+    sessionsList: {
+        // Used by SessionsList component (app/(app)/(tabs)/sessions.tsx)
+        searchPlaceholder: 'Cerca sessions...',
+        filterBackend: {
+            all: 'Tots',
+            claude: 'Claude',
+            codex: 'Codex',
+            gemini: 'Gemini',
+        },
+        filterStatus: {
+            all: 'Tots els estats',
+            active: 'Actives',
+            paused: 'Pausades',
+            offline: 'Fora de línia',
+        },
+        clearFilters: 'Esborra els filtres',
+        menu: {
+            rename: 'Canvia el nom',
+            delete: 'Elimina',
+            viewDetail: 'Veure detalls',
+        },
+        rename: {
+            title: 'Canvia el nom de la sessió',
+            placeholder: 'Introdueix el nom de la sessió...',
+        },
+        delete: {
+            title: 'Elimina la sessió',
+            confirm: 'Segur que vols eliminar aquesta sessió? Aquesta acció no es pot desfer.',
+        },
+        empty: {
+            title: 'Sense sessions',
+            description: 'Connecta un CLI per començar',
+            filteredTitle: 'Cap sessió coincident',
+            filteredDescription: 'Prova d\'ajustar els filtres',
+        },
+        noResults: 'Cap sessió coincideix amb la cerca',
     },
 
     components: {
@@ -718,6 +789,35 @@ export const ca: TranslationStructure = {
         unknownEvent: 'Esdeveniment desconegut',
         usageLimitUntil: ({ time }: { time: string }) => `Límit d'ús assolit fins a ${time}`,
         unknownTime: 'temps desconegut',
+        // MessageStream detail modal
+        details: 'Detalls del missatge',
+        id: 'ID del missatge',
+        timestamp: 'Marca de temps',
+        type: 'Tipus',
+        encryption: 'Xifratge',
+        encrypted: 'Xifrat',
+        unencrypted: 'No xifrat',
+        localId: 'ID local',
+    },
+
+    commandQueue: {
+        // Command Queue Management
+        title: 'Cua de comandes',
+        empty: 'La cua és buida',
+        emptyDescription: 'Les comandes apareixeran aquí quan la IA estigui ocupada',
+        count: ({ count }: { count: number }) => `${count} comand${count !== 1 ? 'es' : 'a'} a la cua`,
+        clear: 'Buida',
+        clearTitle: 'Buida la cua',
+        clearConfirm: 'Estàs segur que vols buidar totes les comandes de la cua?',
+        deleteTitle: 'Elimina la comanda',
+        deleteConfirm: 'Estàs segur que vols eliminar aquesta comanda?',
+        editPlaceholder: 'Edita la comanda...',
+        status: {
+            pending: 'Pendent',
+            sending: 'Enviant',
+            sent: 'Enviada',
+            failed: 'Fallida',
+        },
     },
 
     codex: {
@@ -853,7 +953,190 @@ export const ca: TranslationStructure = {
         friendRequestGeneric: 'Nova sol·licitud d\'amistat',
         friendAccepted: ({ name }: { name: string }) => `Ara ets amic de ${name}`,
         friendAcceptedGeneric: 'Sol·licitud d\'amistat acceptada',
-    }
+    },
+    settingsNotifications: {
+        // Notifications settings screen
+        title: 'Notificacions',
+        subtitle: 'Gestiona la configuració de les notificacions push',
+        webPush: 'Notificacions Push',
+        webPushDescription: 'Rep notificacions fins i tot quan l\'aplicació està tancada. Requereix permís del navegador.',
+        notSupported: 'No suportat',
+        notSupportedDescription: 'El teu navegador no suporta notificacions push. Prova Chrome, Firefox o Edge.',
+        permissionDenied: 'Permís denegat',
+        permissionDeniedDescription: 'Les notificacions push estan bloquejades a la configuració del navegador. Per habilitar-les, canvia el permís del lloc a la configuració del navegador.',
+        permissionRequired: 'Permís requerit',
+        permissionRequiredDescription: 'Toca per permetre les notificacions push',
+        subscribed: 'Subscrit',
+        subscribedDescription: 'Rebràs notificacions push',
+        unsubscribed: 'Deshabilitat',
+        unsubscribedDescription: 'Les notificacions push estan desactivades',
+        enableNotifications: 'Habilita les notificacions',
+        disableNotifications: 'Deshabilita les notificacions',
+        requestPermission: 'Permet les notificacions',
+        notificationTypes: 'Tipus de notificació',
+        notificationTypesDescription: 'Tria quins tipus de notificacions vols rebre',
+        approvalRequest: 'Sol·licituds d\'aprovació',
+        approvalRequestDescription: 'Notificacions quan el terminal demana permís',
+        taskComplete: 'Tasca completada',
+        taskCompleteDescription: 'Notificacions quan una tasca en segon pla es completa',
+        newMessage: 'Nous missatges',
+        newMessageDescription: 'Notificacions per nous missatges a la sessió',
+        systemNotification: 'Alertes del sistema',
+        systemNotificationDescription: 'Alertes importants del sistema i anuncis',
+        deviceInfo: 'Informació del dispositiu',
+        deviceId: 'ID del dispositiu',
+        subscriptionFailed: 'Error en subscriure\'s a les notificacions',
+        unsubscriptionFailed: 'Error en cancel·lar la subscripció de notificacions',
+        updatePreferencesFailed: 'Error en actualitzar les preferències de notificació',
+        testNotification: 'Envia una notificació de prova',
+        testNotificationSent: 'Notificació de prova enviada',
+        testNotificationFailed: 'Error en enviar la notificació de prova',
+    },
+
+    voice: {
+        // Browser Native Voice I/O (Phase 4)
+        browser: {
+            notWebPlatform: 'Les funcions de veu només estan disponibles a la plataforma web',
+            outdatedBrowser: 'Si us plau, actualitza el navegador per utilitzar les funcions de veu',
+            notSupported: 'El teu navegador no suporta les funcions de veu',
+        },
+        errors: {
+            browserNotSupported: {
+                title: 'Navegador no suportat',
+                message: 'El teu navegador no suporta el reconeixement de veu. Utilitza Chrome, Edge o Safari.',
+                suggestion: 'Prova de canviar a un navegador suportat com Chrome o Edge.',
+            },
+            microphonePermissionDenied: {
+                title: 'Accés al micròfon denegat',
+                message: 'S\'ha denegat el permís del micròfon. L\'entrada de veu requereix accés al micròfon.',
+                suggestion: 'Si us plau, habilita l\'accés al micròfon a la configuració del navegador.',
+            },
+            networkError: {
+                title: 'Error de xarxa',
+                message: 'S\'ha produït un error de xarxa durant el reconeixement de veu.',
+                suggestion: 'Comprova la connexió a internet i torna-ho a provar.',
+            },
+            noSpeechDetected: {
+                title: 'No s\'ha detectat veu',
+                message: 'No s\'ha detectat cap veu. Si us plau, parla clarament al micròfon.',
+                suggestion: 'Prova de parlar més fort o apropa\'t al micròfon.',
+            },
+            languageNotSupported: {
+                title: 'Idioma no suportat',
+                message: 'L\'idioma seleccionat no és suportat pel teu navegador.',
+                suggestion: 'Prova de seleccionar un idioma diferent a la configuració de veu.',
+            },
+            synthesisError: {
+                title: 'Error de síntesi de veu',
+                message: 'S\'ha produït un error en generar la sortida de veu.',
+                suggestion: 'Torna-ho a provar o selecciona una veu diferent.',
+            },
+            recognitionAborted: {
+                title: 'Reconeixement aturat',
+                message: 'El reconeixement de veu s\'ha aturat.',
+                suggestion: 'Prem el botó del micròfon per començar de nou.',
+            },
+            audioCaptureError: {
+                title: 'Error de captura d\'àudio',
+                message: 'No s\'ha pogut capturar l\'àudio del micròfon.',
+                suggestion: 'Comprova si una altra aplicació està utilitzant el micròfon.',
+            },
+            serviceUnavailable: {
+                title: 'Servei no disponible',
+                message: 'El servei de reconeixement de veu no està disponible temporalment.',
+                suggestion: 'Espera un moment i torna-ho a provar.',
+            },
+            unknown: {
+                title: 'Error desconegut',
+                message: 'S\'ha produït un error inesperat amb les funcions de veu.',
+                suggestion: 'Torna-ho a provar. Si el problema persisteix, refresca la pàgina.',
+            },
+        },
+        controls: {
+            startListening: 'Començar a escoltar',
+            stopListening: 'Deixar d\'escoltar',
+            startSpeaking: 'Llegir en veu alta',
+            stopSpeaking: 'Deixar de llegir',
+            listening: 'Escoltant...',
+            speaking: 'Parlant...',
+            processing: 'Processant...',
+        },
+        settings: {
+            title: 'Configuració de veu',
+            provider: 'Proveïdor de veu',
+            providerDescription: 'Tria el teu proveïdor de veu preferit',
+            providerBrowser: 'Nadiu del navegador',
+            providerElevenLabs: 'ElevenLabs',
+            input: 'Entrada de veu',
+            inputDescription: 'Habilita la conversió de veu a text per a comandes de veu',
+            inputEnabled: 'Entrada de veu habilitada',
+            inputDisabled: 'Entrada de veu deshabilitada',
+            output: 'Sortida de veu',
+            outputDescription: 'Habilita la conversió de text a veu per a les respostes',
+            outputEnabled: 'Sortida de veu habilitada',
+            outputDisabled: 'Sortida de veu deshabilitada',
+            recognitionLanguage: 'Idioma de reconeixement',
+            recognitionLanguageDescription: 'Idioma per al reconeixement de veu',
+            recognitionLanguageFooter: ({ count }: { count: number }) => `${count} idiomes disponibles`,
+            speechRate: 'Velocitat de la parla',
+            speechRateDescription: 'Ajusta la velocitat de la sortida de veu',
+            speechPitch: 'To de la veu',
+            speechPitchDescription: 'Ajusta el to de la sortida de veu',
+            speechVolume: 'Volum de la parla',
+            speechVolumeDescription: 'Ajusta el volum de la sortida de veu',
+            selectedVoice: 'Veu',
+            selectedVoiceDescription: 'Tria una veu per a la sortida de parla',
+            systemDefault: 'Per defecte del sistema',
+            testVoice: 'Provar veu',
+            testVoiceText: 'Això és una prova de la funció de text a veu.',
+            browserNotSupported: 'Les funcions de veu del navegador no estan suportades',
+            browserNotSupportedDescription: 'El teu navegador no suporta la Web Speech API. Utilitza Chrome, Edge o Safari.',
+        },
+    },
+
+    pwa: {
+        install: {
+            title: 'Instal·la Happy Coder',
+            message: 'Instal·la Happy Coder per una millor experiència amb accés fora de línia i notificacions push.',
+            installButton: 'Instal·la',
+            notNow: 'Ara no',
+            installed: 'Aplicació instal·lada',
+            installedMessage: 'Happy Coder s\'ha instal·lat. Ara pots accedir-hi des de la pantalla d\'inici.',
+        },
+        offline: {
+            title: 'Estàs fora de línia',
+            message: 'Algunes funcions poden estar limitades sense connexió.',
+            reconnecting: 'Reconnectant...',
+            reconnected: 'Connectat de nou',
+        },
+        update: {
+            title: 'Actualització disponible',
+            message: 'Una nova versió de Happy Coder està disponible.',
+            updateButton: 'Actualitza ara',
+            later: 'Més tard',
+        },
+        notifications: {
+            title: 'Notificacions push',
+            description: 'Rep notificacions sobre sol·licituds d\'aprovació i actualitzacions.',
+            enable: 'Habilita les notificacions',
+            disable: 'Deshabilita les notificacions',
+            permissionDenied: 'Notificacions bloquejades',
+            permissionDeniedMessage: 'Si us plau, habilita les notificacions a la configuració del navegador.',
+            subscribed: 'Notificacions habilitades',
+            unsubscribed: 'Notificacions deshabilitades',
+            preferences: 'Preferències de notificació',
+            approvalRequests: 'Sol·licituds d\'aprovació',
+            approvalRequestsDescription: 'Rep notificacions quan algú sol·liciti la teva aprovació',
+            taskComplete: 'Tasca completada',
+            taskCompleteDescription: 'Rep notificacions quan les tasques es completin',
+            newMessage: 'Nous missatges',
+            newMessageDescription: 'Rep notificacions sobre nous missatges',
+            systemAnnouncements: 'Anuncis del sistema',
+            systemAnnouncementsDescription: 'Actualitzacions importants i anuncis',
+            muteAll: 'Silencia tot',
+            muteAllDescription: 'Desactiva temporalment totes les notificacions',
+        },
+    },
 } as const;
 
 export type TranslationsCa = typeof ca;

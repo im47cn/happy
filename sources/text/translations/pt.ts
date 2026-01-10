@@ -57,6 +57,8 @@ export const pt: TranslationStructure = {
         fileViewer: 'Visualizador de arquivos',
         loading: 'Carregando...',
         retry: 'Tentar novamente',
+        delete: 'Excluir',
+        edit: 'Editar',
     },
 
     profile: {
@@ -110,6 +112,8 @@ export const pt: TranslationStructure = {
         voiceAssistantSubtitle: 'Configure as preferências de interação por voz',
         featuresTitle: 'Recursos',
         featuresSubtitle: 'Ativar ou desativar recursos do aplicativo',
+        notifications: 'Notificações',
+        notificationsSubtitle: 'Gerenciar configurações de notificações push',
         developer: 'Desenvolvedor',
         developerTools: 'Ferramentas de desenvolvedor',
         about: 'Sobre',
@@ -243,6 +247,12 @@ export const pt: TranslationStructure = {
         failedToRemoveFriend: 'Falha ao remover amigo',
         searchFailed: 'A busca falhou. Por favor, tente novamente.',
         failedToSendRequest: 'Falha ao enviar solicitação de amizade',
+        // Phase 2: Remote control errors
+        controlFailed: 'A operação de controle falhou',
+        pauseFailed: 'Falha ao pausar a sessão',
+        resumeFailed: 'Falha ao retomar a sessão',
+        terminateFailed: 'Falha ao encerrar a sessão',
+        switchModeFailed: 'Falha ao trocar o modo',
     },
 
     newSession: {
@@ -289,6 +299,29 @@ export const pt: TranslationStructure = {
 
     session: {
         inputPlaceholder: 'Digite uma mensagem ...',
+        // Phase 2: Remote control
+        pause: 'Pausar',
+        resume: 'Retomar',
+        paused: 'Pausado',
+        terminate: 'Encerrar',
+        terminateTitle: 'Encerrar sessão',
+        terminateConfirm: 'Tem certeza de que deseja encerrar esta sessão? Esta ação não pode ser desfeita.',
+        switchMode: 'Trocar modo',
+        switchModeTitle: 'Trocar modo da sessão',
+        switchModeConfirm: ({ mode }: { mode: string }) => `Trocar a sessão para o modo ${mode}?`,
+        localModeBanner: 'Modo local - CLI no controle',
+    },
+
+    // Phase 2: Approvals page
+    approvals: {
+        title: 'Aprovações pendentes',
+        empty: 'Sem aprovações pendentes',
+        emptyDescription: 'Solicitações de permissão das suas sessões CLI aparecerão aqui',
+        waitingForApproval: 'Aguardando sua aprovação',
+        permissionRequest: 'Solicitação de permissão',
+        expiresIn: ({ minutes }: { minutes: number }) => `Expira em ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`,
+        expired: 'Expirado',
+        viewSession: 'Ver sessão',
     },
 
     commandPalette: {
@@ -364,6 +397,44 @@ export const pt: TranslationStructure = {
         failedToDeleteSession: 'Falha ao excluir sessão',
         sessionDeleted: 'Sessão excluída com sucesso',
         
+    },
+
+    sessionsList: {
+        // Used by SessionsList component (app/(app)/(tabs)/sessions.tsx)
+        searchPlaceholder: 'Buscar sessões...',
+        filterBackend: {
+            all: 'Todos',
+            claude: 'Claude',
+            codex: 'Codex',
+            gemini: 'Gemini',
+        },
+        filterStatus: {
+            all: 'Todos os status',
+            active: 'Ativas',
+            paused: 'Pausadas',
+            offline: 'Offline',
+        },
+        clearFilters: 'Limpar filtros',
+        menu: {
+            rename: 'Renomear',
+            delete: 'Excluir',
+            viewDetail: 'Ver detalhes',
+        },
+        rename: {
+            title: 'Renomear sessão',
+            placeholder: 'Digite o nome da sessão...',
+        },
+        delete: {
+            title: 'Excluir sessão',
+            confirm: 'Tem certeza de que deseja excluir esta sessão? Esta ação não pode ser desfeita.',
+        },
+        empty: {
+            title: 'Nenhuma sessão',
+            description: 'Conecte um CLI para começar',
+            filteredTitle: 'Nenhuma sessão correspondente',
+            filteredDescription: 'Tente ajustar os filtros',
+        },
+        noResults: 'Nenhuma sessão corresponde à sua pesquisa',
     },
 
     components: {
@@ -718,6 +789,35 @@ export const pt: TranslationStructure = {
         unknownEvent: 'Evento desconhecido',
         usageLimitUntil: ({ time }: { time: string }) => `Limite de uso atingido até ${time}`,
         unknownTime: 'horário desconhecido',
+        // MessageStream detail modal
+        details: 'Detalhes da mensagem',
+        id: 'ID da mensagem',
+        timestamp: 'Carimbo de data/hora',
+        type: 'Tipo',
+        encryption: 'Criptografia',
+        encrypted: 'Criptografado',
+        unencrypted: 'Não criptografado',
+        localId: 'ID local',
+    },
+
+    commandQueue: {
+        // Command Queue Management
+        title: 'Fila de comandos',
+        empty: 'A fila está vazia',
+        emptyDescription: 'Os comandos aparecerão aqui quando a IA estiver ocupada',
+        count: ({ count }: { count: number }) => `${count} comando${count !== 1 ? 's' : ''} na fila`,
+        clear: 'Limpar',
+        clearTitle: 'Limpar fila',
+        clearConfirm: 'Tem certeza de que deseja limpar todos os comandos na fila?',
+        deleteTitle: 'Excluir comando',
+        deleteConfirm: 'Tem certeza de que deseja excluir este comando?',
+        editPlaceholder: 'Editar comando...',
+        status: {
+            pending: 'Pendente',
+            sending: 'Enviando',
+            sent: 'Enviado',
+            failed: 'Falhou',
+        },
     },
 
     codex: {
@@ -853,7 +953,190 @@ export const pt: TranslationStructure = {
         friendRequestGeneric: 'Novo pedido de amizade',
         friendAccepted: ({ name }: { name: string }) => `Agora você é amigo de ${name}`,
         friendAcceptedGeneric: 'Pedido de amizade aceito',
-    }
+    },
+    settingsNotifications: {
+        // Notifications settings screen
+        title: 'Notificações',
+        subtitle: 'Gerenciar configurações de notificações push',
+        webPush: 'Notificações Push',
+        webPushDescription: 'Receba notificações mesmo quando o aplicativo está fechado. Requer permissão do navegador.',
+        notSupported: 'Não suportado',
+        notSupportedDescription: 'Seu navegador não suporta notificações push. Tente Chrome, Firefox ou Edge.',
+        permissionDenied: 'Permissão negada',
+        permissionDeniedDescription: 'As notificações push estão bloqueadas nas configurações do navegador. Para habilitá-las, altere a permissão do site nas configurações do navegador.',
+        permissionRequired: 'Permissão necessária',
+        permissionRequiredDescription: 'Toque para permitir notificações push',
+        subscribed: 'Inscrito',
+        subscribedDescription: 'Você receberá notificações push',
+        unsubscribed: 'Desabilitado',
+        unsubscribedDescription: 'Notificações push estão desativadas',
+        enableNotifications: 'Habilitar notificações',
+        disableNotifications: 'Desabilitar notificações',
+        requestPermission: 'Permitir notificações',
+        notificationTypes: 'Tipos de notificação',
+        notificationTypesDescription: 'Escolha quais tipos de notificações você deseja receber',
+        approvalRequest: 'Solicitações de aprovação',
+        approvalRequestDescription: 'Notificações quando o terminal solicita permissão',
+        taskComplete: 'Tarefa concluída',
+        taskCompleteDescription: 'Notificações quando uma tarefa em segundo plano é concluída',
+        newMessage: 'Novas mensagens',
+        newMessageDescription: 'Notificações para novas mensagens na sessão',
+        systemNotification: 'Alertas do sistema',
+        systemNotificationDescription: 'Alertas importantes do sistema e anúncios',
+        deviceInfo: 'Informações do dispositivo',
+        deviceId: 'ID do dispositivo',
+        subscriptionFailed: 'Falha ao inscrever-se nas notificações',
+        unsubscriptionFailed: 'Falha ao cancelar inscrição nas notificações',
+        updatePreferencesFailed: 'Falha ao atualizar preferências de notificação',
+        testNotification: 'Enviar notificação de teste',
+        testNotificationSent: 'Notificação de teste enviada',
+        testNotificationFailed: 'Falha ao enviar notificação de teste',
+    },
+
+    voice: {
+        // Browser Native Voice I/O (Phase 4)
+        browser: {
+            notWebPlatform: 'Os recursos de voz estão disponíveis apenas na plataforma web',
+            outdatedBrowser: 'Por favor, atualize seu navegador para usar os recursos de voz',
+            notSupported: 'Seu navegador não suporta recursos de voz',
+        },
+        errors: {
+            browserNotSupported: {
+                title: 'Navegador não suportado',
+                message: 'Seu navegador não suporta reconhecimento de voz. Use Chrome, Edge ou Safari.',
+                suggestion: 'Tente mudar para um navegador compatível como Chrome ou Edge.',
+            },
+            microphonePermissionDenied: {
+                title: 'Acesso ao microfone negado',
+                message: 'A permissão do microfone foi negada. A entrada de voz requer acesso ao microfone.',
+                suggestion: 'Por favor, habilite o acesso ao microfone nas configurações do navegador.',
+            },
+            networkError: {
+                title: 'Erro de rede',
+                message: 'Ocorreu um erro de rede durante o reconhecimento de voz.',
+                suggestion: 'Verifique sua conexão com a internet e tente novamente.',
+            },
+            noSpeechDetected: {
+                title: 'Nenhuma fala detectada',
+                message: 'Nenhuma fala foi detectada. Por favor, fale claramente no microfone.',
+                suggestion: 'Tente falar mais alto ou aproxime-se do microfone.',
+            },
+            languageNotSupported: {
+                title: 'Idioma não suportado',
+                message: 'O idioma selecionado não é suportado pelo seu navegador.',
+                suggestion: 'Tente selecionar um idioma diferente nas configurações de voz.',
+            },
+            synthesisError: {
+                title: 'Erro de síntese de voz',
+                message: 'Ocorreu um erro ao gerar a saída de voz.',
+                suggestion: 'Tente novamente ou selecione uma voz diferente.',
+            },
+            recognitionAborted: {
+                title: 'Reconhecimento interrompido',
+                message: 'O reconhecimento de voz foi interrompido.',
+                suggestion: 'Pressione o botão do microfone para começar novamente.',
+            },
+            audioCaptureError: {
+                title: 'Falha na captura de áudio',
+                message: 'Falha ao capturar áudio do microfone.',
+                suggestion: 'Verifique se outro aplicativo está usando o microfone.',
+            },
+            serviceUnavailable: {
+                title: 'Serviço indisponível',
+                message: 'O serviço de reconhecimento de voz está temporariamente indisponível.',
+                suggestion: 'Aguarde um momento e tente novamente.',
+            },
+            unknown: {
+                title: 'Erro desconhecido',
+                message: 'Ocorreu um erro inesperado com os recursos de voz.',
+                suggestion: 'Tente novamente. Se o problema persistir, atualize a página.',
+            },
+        },
+        controls: {
+            startListening: 'Começar a ouvir',
+            stopListening: 'Parar de ouvir',
+            startSpeaking: 'Ler em voz alta',
+            stopSpeaking: 'Parar de ler',
+            listening: 'Ouvindo...',
+            speaking: 'Falando...',
+            processing: 'Processando...',
+        },
+        settings: {
+            title: 'Configurações de voz',
+            provider: 'Provedor de voz',
+            providerDescription: 'Escolha seu provedor de voz preferido',
+            providerBrowser: 'Nativo do navegador',
+            providerElevenLabs: 'ElevenLabs',
+            input: 'Entrada de voz',
+            inputDescription: 'Habilitar conversão de fala em texto para comandos de voz',
+            inputEnabled: 'Entrada de voz habilitada',
+            inputDisabled: 'Entrada de voz desabilitada',
+            output: 'Saída de voz',
+            outputDescription: 'Habilitar conversão de texto em fala para respostas',
+            outputEnabled: 'Saída de voz habilitada',
+            outputDisabled: 'Saída de voz desabilitada',
+            recognitionLanguage: 'Idioma de reconhecimento',
+            recognitionLanguageDescription: 'Idioma para reconhecimento de voz',
+            recognitionLanguageFooter: ({ count }: { count: number }) => `${count} idiomas disponíveis`,
+            speechRate: 'Velocidade da fala',
+            speechRateDescription: 'Ajuste a velocidade da saída de voz',
+            speechPitch: 'Tom da voz',
+            speechPitchDescription: 'Ajuste o tom da saída de voz',
+            speechVolume: 'Volume da fala',
+            speechVolumeDescription: 'Ajuste o volume da saída de voz',
+            selectedVoice: 'Voz',
+            selectedVoiceDescription: 'Escolha uma voz para a saída de fala',
+            systemDefault: 'Padrão do sistema',
+            testVoice: 'Testar voz',
+            testVoiceText: 'Este é um teste da função de texto para fala.',
+            browserNotSupported: 'Os recursos de voz do navegador não são suportados',
+            browserNotSupportedDescription: 'Seu navegador não suporta a Web Speech API. Use Chrome, Edge ou Safari.',
+        },
+    },
+
+    pwa: {
+        install: {
+            title: 'Instalar Happy Coder',
+            message: 'Instale Happy Coder para uma melhor experiência com acesso offline e notificações push.',
+            installButton: 'Instalar',
+            notNow: 'Agora não',
+            installed: 'Aplicativo instalado',
+            installedMessage: 'Happy Coder foi instalado. Agora você pode acessá-lo pela tela inicial.',
+        },
+        offline: {
+            title: 'Você está offline',
+            message: 'Alguns recursos podem estar limitados sem conexão.',
+            reconnecting: 'Reconectando...',
+            reconnected: 'Conectado novamente',
+        },
+        update: {
+            title: 'Atualização disponível',
+            message: 'Uma nova versão do Happy Coder está disponível.',
+            updateButton: 'Atualizar agora',
+            later: 'Mais tarde',
+        },
+        notifications: {
+            title: 'Notificações push',
+            description: 'Receba notificações sobre solicitações de aprovação e atualizações.',
+            enable: 'Habilitar notificações',
+            disable: 'Desabilitar notificações',
+            permissionDenied: 'Notificações bloqueadas',
+            permissionDeniedMessage: 'Por favor, habilite as notificações nas configurações do navegador.',
+            subscribed: 'Notificações habilitadas',
+            unsubscribed: 'Notificações desabilitadas',
+            preferences: 'Preferências de notificação',
+            approvalRequests: 'Solicitações de aprovação',
+            approvalRequestsDescription: 'Receba notificações quando alguém solicitar sua aprovação',
+            taskComplete: 'Tarefa concluída',
+            taskCompleteDescription: 'Receba notificações quando as tarefas forem concluídas',
+            newMessage: 'Novas mensagens',
+            newMessageDescription: 'Receba notificações sobre novas mensagens',
+            systemAnnouncements: 'Anúncios do sistema',
+            systemAnnouncementsDescription: 'Atualizações importantes e anúncios',
+            muteAll: 'Silenciar tudo',
+            muteAllDescription: 'Desativar temporariamente todas as notificações',
+        },
+    },
 } as const;
 
 export type TranslationsPt = typeof pt;

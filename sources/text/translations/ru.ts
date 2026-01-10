@@ -68,6 +68,8 @@ export const ru: TranslationStructure = {
         fileViewer: 'Просмотр файла',
         loading: 'Загрузка...',
         retry: 'Повторить',
+        delete: 'Удалить',
+        edit: 'Редактировать',
     },
 
     connect: {
@@ -93,6 +95,8 @@ export const ru: TranslationStructure = {
         voiceAssistantSubtitle: 'Настройка предпочтений голосового взаимодействия',
         featuresTitle: 'Возможности',
         featuresSubtitle: 'Включить или отключить функции приложения',
+        notifications: 'Уведомления',
+        notificationsSubtitle: 'Управление настройками push-уведомлений',
         developer: 'Разработчик',
         developerTools: 'Инструменты разработчика',
         about: 'О программе',
@@ -226,6 +230,12 @@ export const ru: TranslationStructure = {
         failedToRemoveFriend: 'Не удалось удалить друга',
         searchFailed: 'Поиск не удался. Пожалуйста, попробуйте снова.',
         failedToSendRequest: 'Не удалось отправить запрос в друзья',
+        // Phase 2: Remote control errors
+        controlFailed: 'Ошибка операции управления',
+        pauseFailed: 'Не удалось приостановить сессию',
+        resumeFailed: 'Не удалось возобновить сессию',
+        terminateFailed: 'Не удалось завершить сессию',
+        switchModeFailed: 'Не удалось переключить режим',
     },
 
     newSession: {
@@ -340,6 +350,44 @@ export const ru: TranslationStructure = {
         sessionDeleted: 'Сессия успешно удалена',
     },
 
+    sessionsList: {
+        // Used by SessionsList component (app/(app)/(tabs)/sessions.tsx)
+        searchPlaceholder: 'Поиск сессий...',
+        filterBackend: {
+            all: 'Все',
+            claude: 'Claude',
+            codex: 'Codex',
+            gemini: 'Gemini',
+        },
+        filterStatus: {
+            all: 'Все статусы',
+            active: 'Активные',
+            paused: 'Приостановленные',
+            offline: 'Офлайн',
+        },
+        clearFilters: 'Сбросить фильтры',
+        menu: {
+            rename: 'Переименовать',
+            delete: 'Удалить',
+            viewDetail: 'Подробнее',
+        },
+        rename: {
+            title: 'Переименовать сессию',
+            placeholder: 'Введите название сессии...',
+        },
+        delete: {
+            title: 'Удалить сессию',
+            confirm: 'Вы уверены, что хотите удалить эту сессию? Это действие нельзя отменить.',
+        },
+        empty: {
+            title: 'Нет сессий',
+            description: 'Подключите CLI, чтобы начать',
+            filteredTitle: 'Нет подходящих сессий',
+            filteredDescription: 'Попробуйте изменить фильтры',
+        },
+        noResults: 'Нет сессий, соответствующих поиску',
+    },
+
     components: {
         emptyMainScreen: {
             // Used by EmptyMainScreen component
@@ -381,6 +429,29 @@ export const ru: TranslationStructure = {
 
     session: {
         inputPlaceholder: 'Введите сообщение...',
+        // Phase 2: Remote control
+        pause: 'Пауза',
+        resume: 'Возобновить',
+        paused: 'На паузе',
+        terminate: 'Завершить',
+        terminateTitle: 'Завершить сессию',
+        terminateConfirm: 'Вы уверены, что хотите завершить эту сессию? Это действие нельзя отменить.',
+        switchMode: 'Сменить режим',
+        switchModeTitle: 'Переключить режим сессии',
+        switchModeConfirm: ({ mode }: { mode: string }) => `Переключить сессию в режим ${mode}?`,
+        localModeBanner: 'Локальный режим - CLI управляет',
+    },
+
+    // Phase 2: Approvals page
+    approvals: {
+        title: 'Ожидающие одобрения',
+        empty: 'Нет ожидающих одобрений',
+        emptyDescription: 'Запросы разрешений от ваших CLI-сессий появятся здесь',
+        waitingForApproval: 'Ожидает вашего одобрения',
+        permissionRequest: 'Запрос разрешения',
+        expiresIn: ({ minutes }: { minutes: number }) => `Истекает через ${minutes} ${minutes === 1 ? 'минуту' : 'минут'}`,
+        expired: 'Истёк',
+        viewSession: 'Просмотр сессии',
     },
 
     commandPalette: {
@@ -716,6 +787,35 @@ export const ru: TranslationStructure = {
         unknownEvent: 'Неизвестное событие',
         usageLimitUntil: ({ time }: { time: string }) => `Лимит использования достигнут до ${time}`,
         unknownTime: 'неизвестное время',
+        // MessageStream detail modal
+        details: 'Детали сообщения',
+        id: 'ID сообщения',
+        timestamp: 'Метка времени',
+        type: 'Тип',
+        encryption: 'Шифрование',
+        encrypted: 'Зашифровано',
+        unencrypted: 'Не зашифровано',
+        localId: 'Локальный ID',
+    },
+
+    commandQueue: {
+        // Command Queue Management
+        title: 'Очередь команд',
+        empty: 'Очередь пуста',
+        emptyDescription: 'Команды появятся здесь, когда ИИ занят',
+        count: ({ count }: { count: number }) => `${count} команд${count === 1 ? 'а' : count < 5 ? 'ы' : ''} в очереди`,
+        clear: 'Очистить',
+        clearTitle: 'Очистить очередь',
+        clearConfirm: 'Вы уверены, что хотите очистить все команды в очереди?',
+        deleteTitle: 'Удалить команду',
+        deleteConfirm: 'Вы уверены, что хотите удалить эту команду?',
+        editPlaceholder: 'Редактировать команду...',
+        status: {
+            pending: 'Ожидание',
+            sending: 'Отправка',
+            sent: 'Отправлено',
+            failed: 'Ошибка',
+        },
     },
 
     codex: {
@@ -876,7 +976,191 @@ export const ru: TranslationStructure = {
         friendRequestGeneric: 'Новый запрос в друзья',
         friendAccepted: ({ name }: { name: string }) => `Вы теперь друзья с ${name}`,
         friendAcceptedGeneric: 'Запрос в друзья принят',
-    }
+    },
+
+    settingsNotifications: {
+        // Notifications settings screen
+        title: 'Уведомления',
+        subtitle: 'Управление настройками push-уведомлений',
+        webPush: 'Push-уведомления',
+        webPushDescription: 'Получайте уведомления даже когда приложение закрыто. Необходимо разрешение браузера.',
+        notSupported: 'Не поддерживается',
+        notSupportedDescription: 'Ваш браузер не поддерживает push-уведомления. Попробуйте Chrome, Firefox или Edge.',
+        permissionDenied: 'Разрешение отклонено',
+        permissionDeniedDescription: 'Push-уведомления заблокированы в настройках браузера. Чтобы включить их, измените разрешение сайта в настройках браузера.',
+        permissionRequired: 'Требуется разрешение',
+        permissionRequiredDescription: 'Нажмите, чтобы разрешить push-уведомления',
+        subscribed: 'Подписан',
+        subscribedDescription: 'Вы будете получать push-уведомления',
+        unsubscribed: 'Отключено',
+        unsubscribedDescription: 'Push-уведомления отключены',
+        enableNotifications: 'Включить уведомления',
+        disableNotifications: 'Отключить уведомления',
+        requestPermission: 'Разрешить уведомления',
+        notificationTypes: 'Типы уведомлений',
+        notificationTypesDescription: 'Выберите, какие типы уведомлений вы хотите получать',
+        approvalRequest: 'Запросы на одобрение',
+        approvalRequestDescription: 'Уведомления когда терминал запрашивает разрешение',
+        taskComplete: 'Завершение задачи',
+        taskCompleteDescription: 'Уведомления когда фоновая задача завершена',
+        newMessage: 'Новые сообщения',
+        newMessageDescription: 'Уведомления о новых сообщениях в сессии',
+        systemNotification: 'Системные оповещения',
+        systemNotificationDescription: 'Важные системные оповещения и объявления',
+        deviceInfo: 'Информация об устройстве',
+        deviceId: 'ID устройства',
+        subscriptionFailed: 'Не удалось подписаться на уведомления',
+        unsubscriptionFailed: 'Не удалось отписаться от уведомлений',
+        updatePreferencesFailed: 'Не удалось обновить настройки уведомлений',
+        testNotification: 'Отправить тестовое уведомление',
+        testNotificationSent: 'Тестовое уведомление отправлено',
+        testNotificationFailed: 'Не удалось отправить тестовое уведомление',
+    },
+
+    voice: {
+        // Browser Native Voice I/O (Phase 4)
+        browser: {
+            notWebPlatform: 'Голосовые функции доступны только на веб-платформе',
+            outdatedBrowser: 'Пожалуйста, обновите браузер для использования голосовых функций',
+            notSupported: 'Ваш браузер не поддерживает голосовые функции',
+        },
+        errors: {
+            browserNotSupported: {
+                title: 'Браузер не поддерживается',
+                message: 'Ваш браузер не поддерживает распознавание речи. Используйте Chrome, Edge или Safari.',
+                suggestion: 'Попробуйте переключиться на поддерживаемый браузер, например Chrome или Edge.',
+            },
+            microphonePermissionDenied: {
+                title: 'Доступ к микрофону запрещён',
+                message: 'Разрешение на доступ к микрофону было отклонено. Голосовой ввод требует доступа к микрофону.',
+                suggestion: 'Пожалуйста, включите доступ к микрофону в настройках браузера.',
+            },
+            networkError: {
+                title: 'Ошибка сети',
+                message: 'Произошла сетевая ошибка при распознавании речи.',
+                suggestion: 'Проверьте подключение к интернету и попробуйте снова.',
+            },
+            noSpeechDetected: {
+                title: 'Речь не обнаружена',
+                message: 'Речь не была обнаружена. Говорите чётко в микрофон.',
+                suggestion: 'Попробуйте говорить громче или приблизьтесь к микрофону.',
+            },
+            languageNotSupported: {
+                title: 'Язык не поддерживается',
+                message: 'Выбранный язык не поддерживается вашим браузером.',
+                suggestion: 'Попробуйте выбрать другой язык в настройках голоса.',
+            },
+            synthesisError: {
+                title: 'Ошибка синтеза речи',
+                message: 'Произошла ошибка при генерации голосового вывода.',
+                suggestion: 'Попробуйте снова или выберите другой голос.',
+            },
+            recognitionAborted: {
+                title: 'Распознавание остановлено',
+                message: 'Распознавание речи было остановлено.',
+                suggestion: 'Нажмите кнопку микрофона, чтобы начать снова.',
+            },
+            audioCaptureError: {
+                title: 'Ошибка захвата аудио',
+                message: 'Не удалось захватить аудио с микрофона.',
+                suggestion: 'Проверьте, не использует ли микрофон другое приложение.',
+            },
+            serviceUnavailable: {
+                title: 'Сервис недоступен',
+                message: 'Сервис распознавания речи временно недоступен.',
+                suggestion: 'Подождите немного и попробуйте снова.',
+            },
+            unknown: {
+                title: 'Неизвестная ошибка',
+                message: 'Произошла непредвиденная ошибка с голосовыми функциями.',
+                suggestion: 'Попробуйте снова. Если проблема сохраняется, обновите страницу.',
+            },
+        },
+        controls: {
+            startListening: 'Начать слушать',
+            stopListening: 'Остановить прослушивание',
+            startSpeaking: 'Читать вслух',
+            stopSpeaking: 'Остановить чтение',
+            listening: 'Слушаю...',
+            speaking: 'Говорю...',
+            processing: 'Обработка...',
+        },
+        settings: {
+            title: 'Настройки голоса',
+            provider: 'Провайдер голоса',
+            providerDescription: 'Выберите предпочтительного провайдера голоса',
+            providerBrowser: 'Встроенный браузер',
+            providerElevenLabs: 'ElevenLabs',
+            input: 'Голосовой ввод',
+            inputDescription: 'Включить преобразование речи в текст для голосовых команд',
+            inputEnabled: 'Голосовой ввод включён',
+            inputDisabled: 'Голосовой ввод выключен',
+            output: 'Голосовой вывод',
+            outputDescription: 'Включить преобразование текста в речь для ответов',
+            outputEnabled: 'Голосовой вывод включён',
+            outputDisabled: 'Голосовой вывод выключен',
+            recognitionLanguage: 'Язык распознавания',
+            recognitionLanguageDescription: 'Язык для распознавания речи',
+            recognitionLanguageFooter: ({ count }: { count: number }) => `${count} языков доступно`,
+            speechRate: 'Скорость речи',
+            speechRateDescription: 'Настройте скорость голосового вывода',
+            speechPitch: 'Высота голоса',
+            speechPitchDescription: 'Настройте высоту голосового вывода',
+            speechVolume: 'Громкость речи',
+            speechVolumeDescription: 'Настройте громкость голосового вывода',
+            selectedVoice: 'Голос',
+            selectedVoiceDescription: 'Выберите голос для речевого вывода',
+            systemDefault: 'Системный по умолчанию',
+            testVoice: 'Тест голоса',
+            testVoiceText: 'Это тест функции преобразования текста в речь.',
+            browserNotSupported: 'Голосовые функции браузера не поддерживаются',
+            browserNotSupportedDescription: 'Ваш браузер не поддерживает Web Speech API. Используйте Chrome, Edge или Safari.',
+        },
+    },
+
+    pwa: {
+        install: {
+            title: 'Установить Happy Coder',
+            message: 'Установите Happy Coder для лучшего опыта с офлайн-доступом и push-уведомлениями.',
+            installButton: 'Установить',
+            notNow: 'Не сейчас',
+            installed: 'Приложение установлено',
+            installedMessage: 'Happy Coder установлен. Теперь вы можете открыть его с главного экрана.',
+        },
+        offline: {
+            title: 'Вы не в сети',
+            message: 'Некоторые функции могут быть ограничены без подключения к сети.',
+            reconnecting: 'Переподключение...',
+            reconnected: 'Снова в сети',
+        },
+        update: {
+            title: 'Доступно обновление',
+            message: 'Доступна новая версия Happy Coder.',
+            updateButton: 'Обновить сейчас',
+            later: 'Позже',
+        },
+        notifications: {
+            title: 'Push-уведомления',
+            description: 'Получайте уведомления о запросах на одобрение и обновлениях.',
+            enable: 'Включить уведомления',
+            disable: 'Отключить уведомления',
+            permissionDenied: 'Уведомления заблокированы',
+            permissionDeniedMessage: 'Пожалуйста, включите уведомления в настройках браузера.',
+            subscribed: 'Уведомления включены',
+            unsubscribed: 'Уведомления отключены',
+            preferences: 'Настройки уведомлений',
+            approvalRequests: 'Запросы на одобрение',
+            approvalRequestsDescription: 'Получать уведомления, когда кто-то запрашивает ваше одобрение',
+            taskComplete: 'Задача выполнена',
+            taskCompleteDescription: 'Получать уведомления о завершении задач',
+            newMessage: 'Новые сообщения',
+            newMessageDescription: 'Получать уведомления о новых сообщениях',
+            systemAnnouncements: 'Системные объявления',
+            systemAnnouncementsDescription: 'Важные обновления и объявления',
+            muteAll: 'Отключить все',
+            muteAllDescription: 'Временно отключить все уведомления',
+        },
+    },
 } as const;
 
 export type TranslationsRu = typeof ru;
