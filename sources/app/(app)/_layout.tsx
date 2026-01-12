@@ -46,6 +46,13 @@ export default function RootLayout() {
                 }}
             />
             <Stack.Screen
+                name="biometric-login"
+                options={{
+                    headerShown: false,
+                    headerTitle: t('biometricLogin.title'),
+                }}
+            />
+            <Stack.Screen
                 name="inbox/index"
                 options={{
                     headerShown: false,

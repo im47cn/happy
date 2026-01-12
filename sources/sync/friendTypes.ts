@@ -5,7 +5,8 @@ import { ImageRefSchema } from './profile';
 // Relationship Status
 //
 
-export const RelationshipStatusSchema = z.enum(['none', 'requested', 'pending', 'friend', 'rejected']);
+// Phase 7: Added 'blocked' status
+export const RelationshipStatusSchema = z.enum(['none', 'requested', 'pending', 'friend', 'rejected', 'blocked']);
 export type RelationshipStatus = z.infer<typeof RelationshipStatusSchema>;
 
 //
@@ -89,4 +90,9 @@ export function isPendingRequest(status: RelationshipStatus): boolean {
 
 export function isRequested(status: RelationshipStatus): boolean {
     return status === 'requested';
+}
+
+// Phase 7: Added blocked status helper
+export function isBlocked(status: RelationshipStatus): boolean {
+    return status === 'blocked';
 }

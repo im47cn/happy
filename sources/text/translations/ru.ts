@@ -230,6 +230,7 @@ export const ru: TranslationStructure = {
         failedToRemoveFriend: 'Не удалось удалить друга',
         searchFailed: 'Поиск не удался. Пожалуйста, попробуйте снова.',
         failedToSendRequest: 'Не удалось отправить запрос в друзья',
+        notConnectedToServer: 'Нет подключения к сети. Пожалуйста, проверьте ваше интернет-соединение.',
         // Phase 2: Remote control errors
         controlFailed: 'Ошибка операции управления',
         pauseFailed: 'Не удалось приостановить сессию',
@@ -295,7 +296,16 @@ export const ru: TranslationStructure = {
         failedToConnectToServer: 'Не удалось подключиться к серверу',
         currentlyUsingCustomServer: 'Сейчас используется пользовательский сервер',
         customServerUrlLabel: 'URL пользовательского сервера',
-        advancedFeatureFooter: 'Это расширенная функция. Изменяйте сервер только если знаете, что делаете. Вам нужно будет выйти и войти снова после изменения серверов.'
+        advancedFeatureFooter: 'Это расширенная функция. Изменяйте сервер только если знаете, что делаете. Вам нужно будет выйти и войти снова после изменения серверов.',
+        scanQrCode: 'Сканировать QR-код',
+        protocolLabel: 'Протокол',
+        hostnameLabel: 'Имя хоста / IP-адрес',
+        portLabel: 'Порт',
+        testConnection: 'Проверить подключение',
+        connectionSuccess: 'Подключение успешно',
+        serverConfigScanned: 'Конфигурация сервера успешно сканирована',
+        invalidQrCode: 'Неверный формат QR-кода',
+        networkUnavailable: 'Сеть недоступна. Проверьте подключение.',
     },
 
     sessionInfo: {
@@ -427,6 +437,16 @@ export const ru: TranslationStructure = {
         hoursAgo: ({ count }: { count: number }) => `${count} ${plural({ count, one: 'час', few: 'часа', many: 'часов' })} назад`,
     },
 
+    connectionIndicator: {
+        title: 'Состояние соединения',
+        server: 'Сервер',
+        defaultServer: 'Happy Server',
+        lastConnected: 'Последнее подключение',
+        lastDisconnected: 'Последнее отключение',
+        reconnect: 'Переподключиться',
+        reconnecting: 'Переподключение...',
+    },
+
     session: {
         inputPlaceholder: 'Введите сообщение...',
         // Phase 2: Remote control
@@ -452,6 +472,26 @@ export const ru: TranslationStructure = {
         expiresIn: ({ minutes }: { minutes: number }) => `Истекает через ${minutes} ${minutes === 1 ? 'минуту' : 'минут'}`,
         expired: 'Истёк',
         viewSession: 'Просмотр сессии',
+    },
+
+    // Phase 2: Approval Dialog Modal
+    approvalDialog: {
+        approve: 'Одобрить',
+        reject: 'Отклонить',
+        modify: 'Изменить',
+        confirmReject: 'Подтвердить отклонение',
+        confirmModify: 'Подтвердить изменение',
+        operation: 'Операция',
+        riskLevel: 'Уровень риска',
+        requestedAt: 'Запрошено',
+        parameters: 'Параметры',
+        rejectReasonLabel: 'Причина отклонения (необязательно)',
+        rejectReasonPlaceholder: 'Введите причину отклонения...',
+        modifyParamsLabel: 'Изменённые параметры (JSON)',
+        approveError: 'Не удалось одобрить. Попробуйте ещё раз.',
+        rejectError: 'Не удалось отклонить. Попробуйте ещё раз.',
+        modifyError: 'Не удалось изменить. Попробуйте ещё раз.',
+        invalidJson: 'Неверный формат JSON. Проверьте ввод.',
     },
 
     commandPalette: {
@@ -721,7 +761,8 @@ export const ru: TranslationStructure = {
         failedToConnectTerminal: 'Не удалось подключить терминал',
         cameraPermissionsRequiredToConnectTerminal: 'Для подключения терминала требуется доступ к камере',
         failedToLinkDevice: 'Не удалось связать устройство',
-        cameraPermissionsRequiredToScanQr: 'Для сканирования QR-кодов требуется доступ к камере'
+        cameraPermissionsRequiredToScanQr: 'Для сканирования QR-кодов требуется доступ к камере',
+        cameraPermissionsRequired: 'Для сканирования QR-кодов требуется доступ к камере',
     },
 
     navigation: {
@@ -740,6 +781,35 @@ export const ru: TranslationStructure = {
         createAccount: 'Создать аккаунт',
         linkOrRestoreAccount: 'Связать или восстановить аккаунт',
         loginWithMobileApp: 'Войти через мобильное приложение',
+    },
+
+    // Phase 6: Biometric Login
+    biometricLogin: {
+        title: 'Быстрый вход',
+        subtitle: 'Используйте биометрическую аутентификацию для быстрого доступа',
+        faceId: 'Face ID',
+        touchId: 'Touch ID',
+        fingerprint: 'Отпечаток пальца',
+        biometric: 'Биометрия',
+        loginWith: ({ type }: { type: string }) => `Войти через ${type}`,
+        usePassword: 'Использовать пароль',
+        enableBiometric: 'Включить биометрический вход',
+        authenticating: 'Аутентификация...',
+        authenticationSuccess: 'Аутентификация успешна',
+        authenticationFailed: 'Ошибка аутентификации',
+        notAvailable: 'Биометрическая аутентификация недоступна на этом устройстве',
+        notEnrolled: 'Биометрические данные не зарегистрированы. Настройте биометрию в настройках устройства.',
+        noCredentials: 'Сохранённые учётные данные не найдены. Сначала войдите с паролем.',
+        hardwareNotAvailable: 'Биометрическое оборудование недоступно',
+        cancelled: 'Аутентификация отменена',
+        lockout: 'Слишком много неудачных попыток. Попробуйте позже.',
+        setupTitle: 'Включить быстрый вход',
+        setupDescription: 'Хотите включить биометрический вход для более быстрого доступа в следующий раз?',
+        setupConfirm: 'Включить',
+        setupDecline: 'Не сейчас',
+        secureStorage: 'Ваши учётные данные надёжно хранятся в связке ключей устройства',
+        biometricEnabled: ({ type }: { type: string }) => `Вход через ${type} включён`,
+        biometricDisabled: 'Биометрический вход отключён',
     },
 
     review: {
@@ -944,6 +1014,7 @@ export const ru: TranslationStructure = {
             pending: 'Запрос ожидается',
             friend: 'Друзья',
             rejected: 'Отклонено',
+            blocked: 'Заблокирован',  // Phase 7
         },
         acceptRequest: 'Принять запрос',
         removeFriend: 'Удалить из друзей',
@@ -954,6 +1025,49 @@ export const ru: TranslationStructure = {
         cancelRequestConfirm: ({ name }: { name: string }) => `Отменить ваш запрос в друзья к ${name}?`,
         denyRequest: 'Отклонить запрос',
         nowFriendsWith: ({ name }: { name: string }) => `Теперь вы друзья с ${name}`,
+        // Phase 7: Blocked users
+        blockedUsers: 'Заблокированные пользователи',
+        noBlockedUsers: 'Нет заблокированных пользователей',
+        blockUser: 'Заблокировать',
+        unblockUser: 'Разблокировать',
+        blockUserConfirm: ({ name }: { name: string }) => `Вы уверены, что хотите заблокировать ${name}? Они не смогут видеть ваши сессии или отправлять вам запросы.`,
+        unblockUserConfirm: ({ name }: { name: string }) => `Вы уверены, что хотите разблокировать ${name}?`,
+        userBlocked: ({ name }: { name: string }) => `${name} заблокирован`,
+        userUnblocked: ({ name }: { name: string }) => `${name} разблокирован`,
+    },
+
+    // Phase 7: Session Sharing
+    sessionSharing: {
+        mySessions: 'Мои сессии',
+        sharedWithMe: 'Доступные мне',
+        accessLevel: {
+            owner: 'Владелец',
+            view: 'Только просмотр',
+            collaborate: 'Совместная работа',
+        },
+        shareSession: 'Поделиться сессией',
+        shareWith: ({ name }: { name: string }) => `Поделиться с ${name}`,
+        manageSharing: 'Управление доступом',
+        viewDescription: 'Только просмотр, без отправки сообщений',
+        collaborateDescription: 'Просмотр и отправка сообщений',
+        selectFriend: 'Выберите друга для совместного доступа',
+        selectPermission: 'Выберите уровень доступа',
+        noFriendsToShare: 'Сначала добавьте друзей, чтобы делиться с ними сессиями',
+        sharedBy: ({ name }: { name: string }) => `Предоставлена ${name}`,
+        sharedWith: ({ name }: { name: string }) => `Доступ открыт для ${name}`,
+        sharedWithCount: ({ count }: { count: number }) => `Доступ открыт для ${count} ${count === 1 ? 'человека' : 'человек'}`,
+        noSharedSessions: 'Пока никто не поделился с вами сессиями',
+        collaborators: 'Участники',
+        noCollaborators: 'Эта сессия никому не предоставлена',
+        changePermission: 'Изменить права',
+        revokeAccess: 'Отозвать доступ',
+        revokeAccessConfirm: ({ name }: { name: string }) => `Вы уверены, что хотите отозвать доступ ${name} к этой сессии?`,
+        shareCreated: ({ name }: { name: string }) => `Сессия предоставлена ${name}`,
+        shareUpdated: ({ name }: { name: string }) => `Права обновлены для ${name}`,
+        shareRevoked: ({ name }: { name: string }) => `Доступ отозван для ${name}`,
+        shareError: 'Не удалось поделиться сессией',
+        readOnlyMode: 'Только просмотр',
+        readOnlyDescription: 'Вы можете просматривать эту сессию, но не можете отправлять сообщения',
     },
 
     usage: {
@@ -976,6 +1090,16 @@ export const ru: TranslationStructure = {
         friendRequestGeneric: 'Новый запрос в друзья',
         friendAccepted: ({ name }: { name: string }) => `Вы теперь друзья с ${name}`,
         friendAcceptedGeneric: 'Запрос в друзья принят',
+        // Phase 7: Extended notification types
+        unknownUser: 'Неизвестный пользователь',
+        session: 'Сессия',
+        friendRequestAcceptedConfirm: ({ name }: { name: string }) => `Вы теперь друзья с ${name}`,
+        friendRequestRejectedConfirm: ({ name }: { name: string }) => `Запрос в друзья от ${name} отклонён`,
+        friendRejected: ({ name }: { name: string }) => `${name} отклонил ваш запрос в друзья`,
+        sessionShared: ({ name }: { name: string }) => `${name} поделился с вами сессией`,
+        sharePermissionChanged: ({ sessionTitle, accessLevel }: { sessionTitle: string; accessLevel: string }) => `Права доступа к "${sessionTitle}" изменены на ${accessLevel}`,
+        shareRevoked: ({ name, sessionTitle }: { name: string; sessionTitle: string }) => `${name} отозвал ваш доступ к "${sessionTitle}"`,
+        sessionActivity: ({ name, sessionTitle }: { name: string; sessionTitle: string }) => `${name} отправил сообщение в "${sessionTitle}"`,
     },
 
     settingsNotifications: {

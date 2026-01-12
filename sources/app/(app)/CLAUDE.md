@@ -1,3 +1,51 @@
+# (app) - 主应用路由
+
+一旦我所属的文件夹有所变化，请更新我。
+
+## 架构说明
+
+此目录包含已认证用户的主应用页面，使用 Expo Router 文件系统路由。
+
+## 核心文件
+
+| 文件 | 地位 | 功能 |
+|------|------|------|
+| `_layout.tsx` | 根布局 | Stack 导航配置，包含所有页面的路由注册 |
+| `index.tsx` | 入口 | 主页面，认证状态分发 |
+| `biometric-login.tsx` | Phase 6 | 生物识别快速登录页面 (Face ID/Touch ID/Fingerprint) |
+| `server.tsx` | Phase 6 | 服务器配置页面 (Happy Server URL 设置) |
+| `approvals.tsx` | Phase 2 | 远程审批请求列表页面 |
+| `changelog.tsx` | 通用 | 更新日志页面 |
+| `text-selection.tsx` | 工具 | 文本选择查看器 |
+
+## 子目录
+
+| 目录 | 说明 |
+|------|------|
+| `artifacts/` | 制品管理 (保存的代码片段等) |
+| `dev/` | 开发调试页面 (不需要 i18n) |
+| `friends/` | 好友管理 (Phase 7 社交功能) |
+| `inbox/` | 收件箱 (社交消息) |
+| `machine/` | 机器管理页面 |
+| `new/` | 新建会话流程 |
+| `restore/` | 账户恢复流程 |
+| `session/` | 会话详情及相关页面 |
+| `settings/` | 设置页面 (账户、外观、语言、通知等) |
+| `terminal/` | 终端连接页面 |
+| `user/` | 用户资料页面 |
+| `zen/` | Zen 模式 (专注界面) |
+
+## Phase 6 新增
+
+- `biometric-login.tsx` - 生物识别登录 UI，支持 Face ID/Touch ID/Fingerprint
+- `server.tsx` - Happy Server URL 配置，支持 QR 扫描
+
+## Data-testid 约定
+
+- `CP-06-*`: 生物识别登录页面 (biometric-login.tsx)
+- `CP-04-*`: 服务器配置页面 (server.tsx)
+
+
 <claude-mem-context>
 # Recent Activity
 

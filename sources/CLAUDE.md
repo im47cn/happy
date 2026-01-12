@@ -1,3 +1,45 @@
+# Happy Mobile Client - Sources
+
+一旦我所属的文件夹有所变化，请更新我。
+
+## 架构概述
+
+React Native (Expo SDK 54) 移动/Web 客户端源码目录，包含 UI 组件、服务层、状态管理和加密模块。
+
+## 核心模块
+
+| 目录 | 功能 |
+|------|------|
+| `app/` | Expo Router 页面和布局 |
+| `auth/` | 认证状态和 Token 存储 |
+| `components/` | 通用 UI 组件 |
+| `encryption/` | TweetNaCL 端到端加密 |
+| `hooks/` | React Hooks |
+| `sync/` | 实时同步和状态管理 |
+| `pwa/` | PWA 推送通知和 Service Worker |
+| `notifications/` | 原生推送通知和生物识别 |
+| `linking/` | Deep Linking 和 Universal Links |
+| `network/` | 网络状态监控 |
+| `text/` | 国际化 (i18n) |
+| `modal/` | 模态框系统 |
+
+## Phase 6 新增模块
+
+### notifications/ - 原生推送和生物识别
+- `pushService.ts` - expo-notifications 集成
+- `biometricService.ts` - Face ID/Touch ID 认证
+- `types.ts` - 类型定义
+
+### linking/ - Deep Linking
+- `linkingService.ts` - expo-linking 集成
+- URL scheme: `happy://`
+- 支持路由: session, approval, settings, connect
+
+### network/ - 网络状态
+- `networkService.ts` - expo-network 集成
+- 网络类型检测和质量评估
+- 状态变化监听
+
 <claude-mem-context>
 # Recent Activity
 

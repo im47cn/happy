@@ -89,6 +89,16 @@ export const en = {
         hoursAgo: ({ count }: { count: number }) => `${count} hour${count !== 1 ? 's' : ''} ago`,
     },
 
+    connectionIndicator: {
+        title: 'Connection Status',
+        server: 'Server',
+        defaultServer: 'Happy Server',
+        lastConnected: 'Last connected',
+        lastDisconnected: 'Last disconnected',
+        reconnect: 'Reconnect',
+        reconnecting: 'Reconnecting...',
+    },
+
     connect: {
         restoreAccount: 'Restore Account',
         enterSecretKey: 'Please enter a secret key',
@@ -298,6 +308,8 @@ export const en = {
         failedToRemoveFriend: 'Failed to remove friend',
         searchFailed: 'Search failed. Please try again.',
         failedToSendRequest: 'Failed to send friend request',
+        // Phase 6: Network connectivity errors
+        notConnectedToServer: 'Not connected to the network. Please check your internet connection.',
         // Phase 2: Remote control errors
         controlFailed: 'Control operation failed',
         pauseFailed: 'Failed to pause session',
@@ -375,6 +387,33 @@ export const en = {
         viewSession: 'View Session',
     },
 
+    // Phase 2: Approval Dialog component
+    approvalDialog: {
+        // Action buttons
+        approve: 'Approve',
+        reject: 'Reject',
+        modify: 'Modify',
+        confirmReject: 'Confirm Reject',
+        confirmModify: 'Confirm Modify',
+
+        // Info labels
+        operation: 'Operation',
+        riskLevel: 'Risk Level',
+        requestedAt: 'Requested',
+        parameters: 'Parameters',
+
+        // Input labels
+        rejectReasonLabel: 'Rejection Reason (optional)',
+        rejectReasonPlaceholder: 'Enter reason for rejection...',
+        modifyParamsLabel: 'Modified Parameters (JSON)',
+
+        // Error messages
+        approveError: 'Failed to approve. Please try again.',
+        rejectError: 'Failed to reject. Please try again.',
+        modifyError: 'Failed to modify. Please try again.',
+        invalidJson: 'Invalid JSON format. Please check your input.',
+    },
+
     commandPalette: {
         placeholder: 'Type a command or search...',
     },
@@ -394,7 +433,17 @@ export const en = {
         failedToConnectToServer: 'Failed to connect to server',
         currentlyUsingCustomServer: 'Currently using custom server',
         customServerUrlLabel: 'Custom Server URL',
-        advancedFeatureFooter: "This is an advanced feature. Only change the server if you know what you're doing. You will need to log out and log in again after changing servers."
+        advancedFeatureFooter: "This is an advanced feature. Only change the server if you know what you're doing. You will need to log out and log in again after changing servers.",
+        // Phase 6: Server Setup enhanced UI
+        scanQrCode: 'Scan QR Code',
+        protocolLabel: 'Protocol',
+        hostnameLabel: 'Hostname / IP Address',
+        portLabel: 'Port',
+        testConnection: 'Test Connection',
+        connectionSuccess: 'Connection successful',
+        serverConfigScanned: 'Server configuration scanned successfully',
+        invalidQrCode: 'Invalid QR code format',
+        networkUnavailable: 'Network unavailable. Check your connection.',
     },
 
     sessionInfo: {
@@ -774,7 +823,9 @@ export const en = {
         failedToConnectTerminal: 'Failed to connect terminal',
         cameraPermissionsRequiredToConnectTerminal: 'Camera permissions are required to connect terminal',
         failedToLinkDevice: 'Failed to link device',
-        cameraPermissionsRequiredToScanQr: 'Camera permissions are required to scan QR codes'
+        cameraPermissionsRequiredToScanQr: 'Camera permissions are required to scan QR codes',
+        // Phase 6: Server Setup
+        cameraPermissionsRequired: 'Camera permissions are required to scan QR codes',
     },
 
     navigation: {
@@ -793,6 +844,48 @@ export const en = {
         createAccount: 'Create account',
         linkOrRestoreAccount: 'Link or restore account',
         loginWithMobileApp: 'Login with mobile app',
+    },
+
+    // Phase 6: Biometric Login
+    biometricLogin: {
+        // Page title and description
+        title: 'Quick Login',
+        subtitle: 'Use biometric authentication for faster access',
+
+        // Biometric type labels
+        faceId: 'Face ID',
+        touchId: 'Touch ID',
+        fingerprint: 'Fingerprint',
+        biometric: 'Biometric',
+
+        // Button labels
+        loginWith: ({ type }: { type: string }) => `Login with ${type}`,
+        usePassword: 'Use Password Instead',
+        enableBiometric: 'Enable Biometric Login',
+
+        // Status messages
+        authenticating: 'Authenticating...',
+        authenticationSuccess: 'Authentication successful',
+        authenticationFailed: 'Authentication failed',
+
+        // Error messages
+        notAvailable: 'Biometric authentication is not available on this device',
+        notEnrolled: 'No biometric data enrolled. Please set up biometrics in device settings.',
+        noCredentials: 'No saved credentials found. Please login with password first.',
+        hardwareNotAvailable: 'Biometric hardware is not available',
+        cancelled: 'Authentication was cancelled',
+        lockout: 'Too many failed attempts. Please try again later.',
+
+        // Setup prompts
+        setupTitle: 'Enable Quick Login',
+        setupDescription: 'Would you like to enable biometric login for faster access next time?',
+        setupConfirm: 'Enable',
+        setupDecline: 'Not Now',
+
+        // Info messages
+        secureStorage: 'Your credentials are securely stored in the device keychain',
+        biometricEnabled: ({ type }: { type: string }) => `${type} login is enabled`,
+        biometricDisabled: 'Biometric login is disabled',
     },
 
     review: {
@@ -973,6 +1066,7 @@ export const en = {
             pending: 'Request pending',
             friend: 'Friends',
             rejected: 'Rejected',
+            blocked: 'Blocked',  // Phase 7
         },
         acceptRequest: 'Accept Request',
         removeFriend: 'Remove Friend',
@@ -983,6 +1077,59 @@ export const en = {
         cancelRequestConfirm: ({ name }: { name: string }) => `Cancel your friendship request to ${name}?`,
         denyRequest: 'Deny friendship',
         nowFriendsWith: ({ name }: { name: string }) => `You are now friends with ${name}`,
+        // Phase 7: Blocked users
+        blockedUsers: 'Blocked Users',
+        noBlockedUsers: 'No blocked users',
+        blockUser: 'Block User',
+        unblockUser: 'Unblock User',
+        blockUserConfirm: ({ name }: { name: string }) => `Are you sure you want to block ${name}? They will not be able to see your sessions or send you requests.`,
+        unblockUserConfirm: ({ name }: { name: string }) => `Are you sure you want to unblock ${name}?`,
+        userBlocked: ({ name }: { name: string }) => `${name} has been blocked`,
+        userUnblocked: ({ name }: { name: string }) => `${name} has been unblocked`,
+    },
+
+    // Phase 7: Session Sharing
+    sessionSharing: {
+        // Tab titles
+        mySessions: 'My Sessions',
+        sharedWithMe: 'Shared with Me',
+        // Access levels
+        accessLevel: {
+            owner: 'Owner',
+            view: 'View Only',
+            collaborate: 'Collaborate',
+        },
+        // Share actions
+        shareSession: 'Share Session',
+        shareWith: ({ name }: { name: string }) => `Share with ${name}`,
+        manageSharing: 'Manage Sharing',
+        // Permission descriptions
+        viewDescription: 'Can view but not send messages',
+        collaborateDescription: 'Can view and send messages',
+        // Share modal
+        selectFriend: 'Select a friend to share with',
+        selectPermission: 'Select permission level',
+        noFriendsToShare: 'Add friends first to share sessions with them',
+        // Share statuses
+        sharedBy: ({ name }: { name: string }) => `Shared by ${name}`,
+        sharedWith: ({ name }: { name: string }) => `Shared with ${name}`,
+        sharedWithCount: ({ count }: { count: number }) => `Shared with ${count} ${count === 1 ? 'person' : 'people'}`,
+        noSharedSessions: 'No sessions have been shared with you yet',
+        // Collaborator list
+        collaborators: 'Collaborators',
+        noCollaborators: 'This session is not shared with anyone',
+        // Actions
+        changePermission: 'Change Permission',
+        revokeAccess: 'Revoke Access',
+        revokeAccessConfirm: ({ name }: { name: string }) => `Are you sure you want to revoke ${name}'s access to this session?`,
+        // Success/error messages
+        shareCreated: ({ name }: { name: string }) => `Session shared with ${name}`,
+        shareUpdated: ({ name }: { name: string }) => `Permission updated for ${name}`,
+        shareRevoked: ({ name }: { name: string }) => `Access revoked for ${name}`,
+        shareError: 'Failed to share session',
+        // Read-only mode
+        readOnlyMode: 'View Only',
+        readOnlyDescription: 'You can view this session but cannot send messages',
     },
 
     usage: {
@@ -1005,6 +1152,16 @@ export const en = {
         friendRequestGeneric: 'New friend request',
         friendAccepted: ({ name }: { name: string }) => `You are now friends with ${name}`,
         friendAcceptedGeneric: 'Friend request accepted',
+        // Phase 7: Extended notification types
+        unknownUser: 'Unknown user',
+        session: 'Session',
+        friendRequestAcceptedConfirm: ({ name }: { name: string }) => `You are now friends with ${name}`,
+        friendRequestRejectedConfirm: ({ name }: { name: string }) => `Declined friend request from ${name}`,
+        friendRejected: ({ name }: { name: string }) => `${name} declined your friend request`,
+        sessionShared: ({ name }: { name: string }) => `${name} shared a session with you`,
+        sharePermissionChanged: ({ sessionTitle, accessLevel }: { sessionTitle: string; accessLevel: string }) => `Permission changed to ${accessLevel} for "${sessionTitle}"`,
+        shareRevoked: ({ name, sessionTitle }: { name: string; sessionTitle: string }) => `${name} revoked your access to "${sessionTitle}"`,
+        sessionActivity: ({ name, sessionTitle }: { name: string; sessionTitle: string }) => `${name} sent a message in "${sessionTitle}"`,
     },
 
     voice: {

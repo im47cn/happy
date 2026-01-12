@@ -39,6 +39,8 @@ export interface ItemProps {
     dividerInset?: number;
     pressableStyle?: StyleProp<ViewStyle>;
     copy?: boolean | string;
+    /** Test ID for E2E testing */
+    testID?: string;
 }
 
 const stylesheet = StyleSheet.create((theme, runtime) => ({
@@ -142,7 +144,8 @@ export const Item = React.memo<ItemProps>((props) => {
         showDivider = true,
         dividerInset = isIOS ? 15 : 16,
         pressableStyle,
-        copy
+        copy,
+        testID
     } = props;
 
     // Handle copy functionality
@@ -305,11 +308,12 @@ export const Item = React.memo<ItemProps>((props) => {
                     borderless: false,
                     foreground: true
                 } : undefined}
+                testID={testID}
             >
                 {content}
             </Pressable>
         );
     }
 
-    return <View style={[{ opacity: disabled ? 0.5 : 1 }, pressableStyle]}>{content}</View>;
+    return <View style={[{ opacity: disabled ? 0.5 : 1 }, pressableStyle]} testID={testID}>{content}</View>;
 });

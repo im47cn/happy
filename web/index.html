@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#18171C" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Happy Coder" />
+    <meta name="application-name" content="Happy Coder" />
+    <meta name="msapplication-TileColor" content="#18171C" />
+    <meta name="msapplication-config" content="none" />
+
+    <!-- SEO -->
+    <meta name="description" content="Mobile and web access to AI coding assistants with end-to-end encryption" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <link rel="shortcut icon" href="/favicon.png" />
+
+    <title>Happy Coder</title>
+
+    <style>
+      /* Critical CSS for splash screen */
+      html, body, #root {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      #root {
+        display: flex;
+        background-color: #F2F2F7;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        #root {
+          background-color: #1C1C1E;
+        }
+      }
+
+      /* Hide scrollbar for PWA feel */
+      ::-webkit-scrollbar {
+        display: none;
+      }
+
+      body {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* Safe area for notched devices */
+      @supports (padding: env(safe-area-inset-top)) {
+        body {
+          padding-top: env(safe-area-inset-top);
+          padding-bottom: env(safe-area-inset-bottom);
+          padding-left: env(safe-area-inset-left);
+          padding-right: env(safe-area-inset-right);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run Happy Coder.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

@@ -1,3 +1,53 @@
+# components - 共享 UI 组件
+
+一旦我所属的文件夹有所变化，请更新我。
+
+## 架构说明
+
+此目录包含应用中可复用的 UI 组件，按功能分类组织。
+
+## 核心组件
+
+| 文件 | 地位 | 功能 |
+|------|------|------|
+| `ConnectionIndicator.tsx` | Phase 6 | WebSocket 连接状态指示器，支持详情弹窗和手动重连 |
+| `HomeHeader.tsx` | 核心 | 主页顶部导航栏，集成 ConnectionIndicator |
+| `StatusDot.tsx` | 基础 | 动画状态点组件（脉冲效果） |
+| `Avatar.tsx` | 基础 | 用户头像组件 |
+| `MainView.tsx` | 核心 | 主视图容器 |
+| `SidebarView.tsx` | 核心 | 侧边栏导航 |
+| `MessageView.tsx` | 核心 | 消息展示组件 |
+| `ChatList.tsx` | 核心 | 会话列表 |
+| `AgentInput.tsx` | 核心 | AI 代理输入框 |
+| `MultiTextInput.tsx` | 基础 | 多行文本输入（平台差异实现） |
+
+## 子目录
+
+| 目录 | 说明 |
+|------|------|
+| `CommandPalette/` | 命令面板组件 |
+| `diff/` | Diff 视图组件 |
+| `layout/` | 布局约束组件 |
+| `markdown/` | Markdown 渲染 |
+| `navigation/` | 导航相关组件 |
+| `qr/` | QR 码生成/扫描 |
+| `tools/` | AI 工具视图组件 |
+| `usage/` | 用量统计组件 |
+| `web/` | Web 平台专用组件 |
+
+## Phase 6 新增
+
+- `ConnectionIndicator.tsx` - 连接状态指示器 (CP-08)
+  - 显示 WebSocket 连接状态（connected/connecting/disconnected/error）
+  - 点击展开详情模态框
+  - 支持手动重连
+  - 显示服务器地址和最后连接/断开时间
+
+## Data-testid 约定
+
+- `CP-08-*`: ConnectionIndicator 组件
+
+
 <claude-mem-context>
 # Recent Activity
 

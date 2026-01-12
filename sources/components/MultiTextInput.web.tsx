@@ -61,7 +61,9 @@ export const MultiTextInput = React.forwardRef<MultiTextInputHandle, MultiTextIn
     const handleKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (!onKeyPress) return;
 
-        const isComposing = e.nativeEvent.isComposing || e.isComposing || e.keyCode === 229;
+        // Check IME composition state from native event (e.isComposing is not available on React's synthetic event)
+        const nativeEvent = e.nativeEvent as KeyboardEvent;
+        const isComposing = nativeEvent.isComposing || e.keyCode === 229;
         if (isComposing) {
             return;
         }

@@ -1853,10 +1853,19 @@ class Sync {
                 counter: parseInt(feedUpdate.cursor.substring(2), 10)
             };
             
-            // Check if we need to fetch user for friend-related items
-            if (feedItem.body && (feedItem.body.kind === 'friend_request' || feedItem.body.kind === 'friend_accepted')) {
+            // Check if we need to fetch user for social notification items
+            // Phase 7: Extended to include all social feature notification types with uid
+            const socialKindsWithUid = [
+                'friend_request',
+                'friend_accepted',
+                'friend_rejected',
+                'session_shared',
+                'share_revoked',
+                'session_activity'
+            ];
+            if (feedItem.body && socialKindsWithUid.includes(feedItem.body.kind) && 'uid' in feedItem.body) {
                 await this.assumeUsers([feedItem.body.uid]);
-                
+
                 // Check if user fetch failed (404) - don't store item if user not found
                 const users = storage.getState().users;
                 const userProfile = users[feedItem.body.uid];

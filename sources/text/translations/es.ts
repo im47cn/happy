@@ -89,6 +89,16 @@ export const es: TranslationStructure = {
         hoursAgo: ({ count }: { count: number }) => `hace ${count} hora${count !== 1 ? 's' : ''}`,
     },
 
+    connectionIndicator: {
+        title: 'Estado de conexión',
+        server: 'Servidor',
+        defaultServer: 'Happy Server',
+        lastConnected: 'Última conexión',
+        lastDisconnected: 'Última desconexión',
+        reconnect: 'Reconectar',
+        reconnecting: 'Reconectando...',
+    },
+
     connect: {
         restoreAccount: 'Restaurar cuenta',
         enterSecretKey: 'Ingresa tu clave secreta',
@@ -247,6 +257,7 @@ export const es: TranslationStructure = {
         failedToRemoveFriend: 'No se pudo eliminar al amigo',
         searchFailed: 'La búsqueda falló. Por favor, intenta de nuevo.',
         failedToSendRequest: 'No se pudo enviar la solicitud de amistad',
+        notConnectedToServer: 'No conectado a la red. Por favor, verifica tu conexión a internet.',
         // Phase 2: Remote control errors
         controlFailed: 'La operación de control falló',
         pauseFailed: 'No se pudo pausar la sesión',
@@ -324,6 +335,26 @@ export const es: TranslationStructure = {
         viewSession: 'Ver sesión',
     },
 
+    // Phase 2: Approval Dialog Modal
+    approvalDialog: {
+        approve: 'Aprobar',
+        reject: 'Rechazar',
+        modify: 'Modificar',
+        confirmReject: 'Confirmar rechazo',
+        confirmModify: 'Confirmar modificación',
+        operation: 'Operación',
+        riskLevel: 'Nivel de riesgo',
+        requestedAt: 'Solicitado',
+        parameters: 'Parámetros',
+        rejectReasonLabel: 'Razón del rechazo (opcional)',
+        rejectReasonPlaceholder: 'Ingrese el motivo del rechazo...',
+        modifyParamsLabel: 'Parámetros modificados (JSON)',
+        approveError: 'Error al aprobar. Por favor, intente de nuevo.',
+        rejectError: 'Error al rechazar. Por favor, intente de nuevo.',
+        modifyError: 'Error al modificar. Por favor, intente de nuevo.',
+        invalidJson: 'Formato JSON inválido. Por favor, verifique su entrada.',
+    },
+
     commandPalette: {
         placeholder: 'Escriba un comando o busque...',
     },
@@ -343,7 +374,16 @@ export const es: TranslationStructure = {
         failedToConnectToServer: 'Falló al conectar con el servidor',
         currentlyUsingCustomServer: 'Actualmente usando servidor personalizado',
         customServerUrlLabel: 'URL del servidor personalizado',
-        advancedFeatureFooter: 'Esta es una característica avanzada. Solo cambia el servidor si sabes lo que haces. Necesitarás cerrar sesión e iniciarla nuevamente después de cambiar servidores.'
+        advancedFeatureFooter: 'Esta es una característica avanzada. Solo cambia el servidor si sabes lo que haces. Necesitarás cerrar sesión e iniciarla nuevamente después de cambiar servidores.',
+        scanQrCode: 'Escanear código QR',
+        protocolLabel: 'Protocolo',
+        hostnameLabel: 'Nombre de host / Dirección IP',
+        portLabel: 'Puerto',
+        testConnection: 'Probar conexión',
+        connectionSuccess: 'Conexión exitosa',
+        serverConfigScanned: 'Configuración del servidor escaneada correctamente',
+        invalidQrCode: 'Formato de código QR no válido',
+        networkUnavailable: 'Red no disponible. Verifica tu conexión.',
     },
 
     sessionInfo: {
@@ -723,7 +763,8 @@ export const es: TranslationStructure = {
         failedToConnectTerminal: 'Falló al conectar terminal',
         cameraPermissionsRequiredToConnectTerminal: 'Se requieren permisos de cámara para conectar terminal',
         failedToLinkDevice: 'Falló al vincular dispositivo',
-        cameraPermissionsRequiredToScanQr: 'Se requieren permisos de cámara para escanear códigos QR'
+        cameraPermissionsRequiredToScanQr: 'Se requieren permisos de cámara para escanear códigos QR',
+        cameraPermissionsRequired: 'Se requieren permisos de cámara para escanear códigos QR',
     },
 
     navigation: {
@@ -742,6 +783,35 @@ export const es: TranslationStructure = {
         createAccount: 'Crear cuenta',
         linkOrRestoreAccount: 'Vincular o restaurar cuenta',
         loginWithMobileApp: 'Iniciar sesión con aplicación móvil',
+    },
+
+    // Phase 6: Biometric Login
+    biometricLogin: {
+        title: 'Inicio de sesión rápido',
+        subtitle: 'Usa autenticación biométrica para acceder más rápido',
+        faceId: 'Face ID',
+        touchId: 'Touch ID',
+        fingerprint: 'Huella dactilar',
+        biometric: 'Biométrico',
+        loginWith: ({ type }: { type: string }) => `Iniciar sesión con ${type}`,
+        usePassword: 'Usar contraseña',
+        enableBiometric: 'Activar inicio de sesión biométrico',
+        authenticating: 'Autenticando...',
+        authenticationSuccess: 'Autenticación exitosa',
+        authenticationFailed: 'Autenticación fallida',
+        notAvailable: 'La autenticación biométrica no está disponible en este dispositivo',
+        notEnrolled: 'No hay datos biométricos registrados. Configura la biometría en los ajustes del dispositivo.',
+        noCredentials: 'No se encontraron credenciales guardadas. Inicia sesión con contraseña primero.',
+        hardwareNotAvailable: 'El hardware biométrico no está disponible',
+        cancelled: 'La autenticación fue cancelada',
+        lockout: 'Demasiados intentos fallidos. Inténtalo de nuevo más tarde.',
+        setupTitle: 'Activar inicio de sesión rápido',
+        setupDescription: '¿Deseas activar el inicio de sesión biométrico para acceder más rápido la próxima vez?',
+        setupConfirm: 'Activar',
+        setupDecline: 'Ahora no',
+        secureStorage: 'Tus credenciales se almacenan de forma segura en el llavero del dispositivo',
+        biometricEnabled: ({ type }: { type: string }) => `El inicio de sesión con ${type} está activado`,
+        biometricDisabled: 'El inicio de sesión biométrico está desactivado',
     },
 
     review: {
@@ -922,6 +992,7 @@ export const es: TranslationStructure = {
             pending: 'Solicitud pendiente',
             friend: 'Amigos',
             rejected: 'Rechazada',
+            blocked: 'Bloqueado',  // Phase 7
         },
         acceptRequest: 'Aceptar solicitud',
         removeFriend: 'Eliminar de amigos',
@@ -932,6 +1003,49 @@ export const es: TranslationStructure = {
         cancelRequestConfirm: ({ name }: { name: string }) => `¿Cancelar tu solicitud de amistad a ${name}?`,
         denyRequest: 'Rechazar solicitud',
         nowFriendsWith: ({ name }: { name: string }) => `Ahora eres amigo de ${name}`,
+        // Phase 7: Blocked users
+        blockedUsers: 'Usuarios bloqueados',
+        noBlockedUsers: 'No hay usuarios bloqueados',
+        blockUser: 'Bloquear usuario',
+        unblockUser: 'Desbloquear usuario',
+        blockUserConfirm: ({ name }: { name: string }) => `¿Estás seguro de que quieres bloquear a ${name}? No podrán ver tus sesiones ni enviarte solicitudes.`,
+        unblockUserConfirm: ({ name }: { name: string }) => `¿Estás seguro de que quieres desbloquear a ${name}?`,
+        userBlocked: ({ name }: { name: string }) => `${name} ha sido bloqueado`,
+        userUnblocked: ({ name }: { name: string }) => `${name} ha sido desbloqueado`,
+    },
+
+    // Phase 7: Session Sharing
+    sessionSharing: {
+        mySessions: 'Mis sesiones',
+        sharedWithMe: 'Compartidas conmigo',
+        accessLevel: {
+            owner: 'Propietario',
+            view: 'Solo lectura',
+            collaborate: 'Colaborar',
+        },
+        shareSession: 'Compartir sesión',
+        shareWith: ({ name }: { name: string }) => `Compartir con ${name}`,
+        manageSharing: 'Gestionar compartición',
+        viewDescription: 'Solo lectura, sin enviar mensajes',
+        collaborateDescription: 'Lectura y envío de mensajes',
+        selectFriend: 'Selecciona un amigo para compartir',
+        selectPermission: 'Selecciona el nivel de permiso',
+        noFriendsToShare: 'Agrega amigos primero para compartir sesiones con ellos',
+        sharedBy: ({ name }: { name: string }) => `Compartida por ${name}`,
+        sharedWith: ({ name }: { name: string }) => `Compartida con ${name}`,
+        sharedWithCount: ({ count }: { count: number }) => `Compartida con ${count} ${count === 1 ? 'persona' : 'personas'}`,
+        noSharedSessions: 'Aún no se han compartido sesiones contigo',
+        collaborators: 'Colaboradores',
+        noCollaborators: 'Esta sesión no está compartida con nadie',
+        changePermission: 'Cambiar permiso',
+        revokeAccess: 'Revocar acceso',
+        revokeAccessConfirm: ({ name }: { name: string }) => `¿Estás seguro de que quieres revocar el acceso de ${name} a esta sesión?`,
+        shareCreated: ({ name }: { name: string }) => `Sesión compartida con ${name}`,
+        shareUpdated: ({ name }: { name: string }) => `Permiso actualizado para ${name}`,
+        shareRevoked: ({ name }: { name: string }) => `Acceso revocado para ${name}`,
+        shareError: 'No se pudo compartir la sesión',
+        readOnlyMode: 'Solo lectura',
+        readOnlyDescription: 'Puedes ver esta sesión pero no puedes enviar mensajes',
     },
 
     usage: {
@@ -954,6 +1068,16 @@ export const es: TranslationStructure = {
         friendRequestGeneric: 'Nueva solicitud de amistad',
         friendAccepted: ({ name }: { name: string }) => `Ahora eres amigo de ${name}`,
         friendAcceptedGeneric: 'Solicitud de amistad aceptada',
+        // Phase 7: Extended notification types
+        unknownUser: 'Usuario desconocido',
+        session: 'Sesión',
+        friendRequestAcceptedConfirm: ({ name }: { name: string }) => `Ahora eres amigo de ${name}`,
+        friendRequestRejectedConfirm: ({ name }: { name: string }) => `Solicitud de amistad de ${name} rechazada`,
+        friendRejected: ({ name }: { name: string }) => `${name} rechazó tu solicitud de amistad`,
+        sessionShared: ({ name }: { name: string }) => `${name} compartió una sesión contigo`,
+        sharePermissionChanged: ({ sessionTitle, accessLevel }: { sessionTitle: string; accessLevel: string }) => `Permiso cambiado a ${accessLevel} para "${sessionTitle}"`,
+        shareRevoked: ({ name, sessionTitle }: { name: string; sessionTitle: string }) => `${name} revocó tu acceso a "${sessionTitle}"`,
+        sessionActivity: ({ name, sessionTitle }: { name: string; sessionTitle: string }) => `${name} envió un mensaje en "${sessionTitle}"`,
     },
 
     settingsNotifications: {

@@ -1295,3 +1295,11 @@ export function useRequestedFriends() {
         return Object.values(state.friends).filter(friend => friend.status === 'requested');
     }));
 }
+
+// Phase 7: Blocked users hook
+export function useBlockedUsers() {
+    return storage(useShallow((state) => {
+        // Filter friends to get blocked users (where status is 'blocked')
+        return Object.values(state.friends).filter(friend => friend.status === 'blocked');
+    }));
+}

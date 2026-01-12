@@ -3,7 +3,7 @@ import { View, ActivityIndicator, Linking } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Text } from '@/components/StyledText';
 import { useAuth } from '@/auth/AuthContext';
-import { getUserProfile, sendFriendRequest, removeFriend } from '@/sync/apiFriends';
+import { getUserProfile, sendFriendRequest, removeFriend, blockUser, unblockUser } from '@/sync/apiFriends';
 import { UserProfile, getDisplayName } from '@/sync/friendTypes';
 import { Avatar } from '@/components/Avatar';
 import { ItemList } from '@/components/ItemList';
@@ -63,7 +63,7 @@ export default function UserProfileScreen() {
         }
     });
 
-    // Remove friend / Cancel request / Reject request action  
+    // Remove friend / Cancel request / Reject request action
     const [removingFriend, handleRemoveFriend] = useHappyAction(async () => {
         if (!credentials || !userProfile) return;
 
@@ -93,6 +93,50 @@ export default function UserProfileScreen() {
         }
     });
 
+    // Phase 7: Block user action
+    const [blockingUser, handleBlockUser] = useHappyAction(async () => {
+        if (!credentials || !userProfile) return;
+
+        const confirmed = await Modal.confirm(
+            t('friends.blockUser'),
+            t('friends.blockUserConfirm', { name: getDisplayName(userProfile) }),
+            { confirmText: t('friends.blockUser'), destructive: true }
+        );
+
+        if (!confirmed) return;
+
+        const success = await blockUser(credentials, userProfile.id);
+        if (success) {
+            // Reload profile to reflect blocked status
+            const profile = await getUserProfile(credentials, userProfile.id);
+            if (profile) {
+                setUserProfile(profile);
+            }
+        }
+    });
+
+    // Phase 7: Unblock user action
+    const [unblockingUser, handleUnblockUser] = useHappyAction(async () => {
+        if (!credentials || !userProfile) return;
+
+        const confirmed = await Modal.confirm(
+            t('friends.unblockUser'),
+            t('friends.unblockUserConfirm', { name: getDisplayName(userProfile) }),
+            { confirmText: t('friends.unblockUser'), destructive: false }
+        );
+
+        if (!confirmed) return;
+
+        const success = await unblockUser(credentials, userProfile.id);
+        if (success) {
+            // Reload profile to reflect unblocked status
+            const profile = await getUserProfile(credentials, userProfile.id);
+            if (profile) {
+                setUserProfile(profile);
+            }
+        }
+    });
+
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
@@ -115,13 +159,30 @@ export default function UserProfileScreen() {
     // Determine friend actions based on status
     const getFriendActions = () => {
         switch (userProfile.status) {
-            case 'friend':
+            case 'blocked':
+                // Phase 7: User is blocked - show unblock option
                 return [{
-                    title: t('friends.removeFriend'),
-                    icon: <Ionicons name="person-remove-outline" size={29} color="#FF3B30" />,
-                    onPress: handleRemoveFriend,
-                    loading: removingFriend,
+                    title: t('friends.unblockUser'),
+                    icon: <Ionicons name="lock-open-outline" size={29} color="#007AFF" />,
+                    onPress: handleUnblockUser,
+                    loading: unblockingUser,
                 }];
+            case 'friend':
+                return [
+                    {
+                        title: t('friends.removeFriend'),
+                        icon: <Ionicons name="person-remove-outline" size={29} color="#FF3B30" />,
+                        onPress: handleRemoveFriend,
+                        loading: removingFriend,
+                    },
+                    // Phase 7: Add block option for friends
+                    {
+                        title: t('friends.blockUser'),
+                        icon: <Ionicons name="ban-outline" size={29} color="#FF3B30" />,
+                        onPress: handleBlockUser,
+                        loading: blockingUser,
+                    }
+                ];
             case 'pending':
                 // User has received a friend request
                 return [
@@ -136,25 +197,50 @@ export default function UserProfileScreen() {
                         icon: <Ionicons name="close-circle-outline" size={29} color="#FF3B30" />,
                         onPress: handleRemoveFriend,
                         loading: removingFriend,
+                    },
+                    // Phase 7: Add block option for pending requests
+                    {
+                        title: t('friends.blockUser'),
+                        icon: <Ionicons name="ban-outline" size={29} color="#FF3B30" />,
+                        onPress: handleBlockUser,
+                        loading: blockingUser,
                     }
                 ];
             case 'requested':
                 // User has sent a friend request
-                return [{
-                    title: t('friends.cancelRequest'),
-                    icon: <Ionicons name="close-outline" size={29} color="#FF9500" />,
-                    onPress: handleRemoveFriend,
-                    loading: removingFriend,
-                }];
+                return [
+                    {
+                        title: t('friends.cancelRequest'),
+                        icon: <Ionicons name="close-outline" size={29} color="#FF9500" />,
+                        onPress: handleRemoveFriend,
+                        loading: removingFriend,
+                    },
+                    // Phase 7: Add block option for sent requests
+                    {
+                        title: t('friends.blockUser'),
+                        icon: <Ionicons name="ban-outline" size={29} color="#FF3B30" />,
+                        onPress: handleBlockUser,
+                        loading: blockingUser,
+                    }
+                ];
             case 'rejected':
             case 'none':
             default:
-                return [{
-                    title: t('friends.requestFriendship'),
-                    icon: <Ionicons name="person-add-outline" size={29} color="#007AFF" />,
-                    onPress: addFriend,
-                    loading: addingFriend,
-                }];
+                return [
+                    {
+                        title: t('friends.requestFriendship'),
+                        icon: <Ionicons name="person-add-outline" size={29} color="#007AFF" />,
+                        onPress: addFriend,
+                        loading: addingFriend,
+                    },
+                    // Phase 7: Add block option for non-friends
+                    {
+                        title: t('friends.blockUser'),
+                        icon: <Ionicons name="ban-outline" size={29} color="#FF3B30" />,
+                        onPress: handleBlockUser,
+                        loading: blockingUser,
+                    }
+                ];
         }
     };
 
@@ -188,6 +274,13 @@ export default function UserProfileScreen() {
                         <View style={styles.statusBadge}>
                             <Ionicons name="checkmark-circle" size={16} color="#34C759" />
                             <Text style={styles.statusText}>{t('friends.alreadyFriends')}</Text>
+                        </View>
+                    )}
+                    {/* Phase 7: Blocked Status Badge */}
+                    {userProfile.status === 'blocked' && (
+                        <View style={styles.blockedBadge}>
+                            <Ionicons name="ban" size={16} color="#FF3B30" />
+                            <Text style={styles.blockedText}>{t('friends.status.blocked')}</Text>
                         </View>
                     )}
                 </View>
@@ -313,6 +406,22 @@ const styles = StyleSheet.create((theme) => ({
     statusText: {
         fontSize: 13,
         color: '#34C759',
+        marginLeft: 4,
+        fontWeight: '500',
+    },
+    // Phase 7: Blocked badge styles
+    blockedBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 59, 48, 0.1)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+        marginTop: 8,
+    },
+    blockedText: {
+        fontSize: 13,
+        color: '#FF3B30',
         marginLeft: 4,
         fontWeight: '500',
     },

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
-import { useAcceptedFriends, useFriendRequests, useRequestedFriends } from '@/sync/storage';
+import { useAcceptedFriends, useFriendRequests, useRequestedFriends, useBlockedUsers } from '@/sync/storage';
 import { UserCard } from '@/components/UserCard';
 import { removeFriend, sendFriendRequest } from '@/sync/apiFriends';
 import { useAuth } from '@/auth/AuthContext';
@@ -19,6 +19,7 @@ export default function FriendsScreen() {
     const friends = useAcceptedFriends();
     const friendRequests = useFriendRequests();
     const requestedFriends = useRequestedFriends();
+    const blockedUsers = useBlockedUsers();  // Phase 7
     const [processingId, setProcessingId] = React.useState<string | null>(null);
 
     const [acceptLoading, doAccept] = useHappyAction(async () => {
@@ -147,6 +148,22 @@ export default function FriendsScreen() {
                     ))
                 )}
             </ItemGroup>
+
+            {/* Phase 7: Blocked Users Section */}
+            {blockedUsers.length > 0 && (
+                <ItemGroup
+                    title={t('friends.blockedUsers')}
+                    style={styles.groupStyle}
+                >
+                    {blockedUsers.map((user) => (
+                        <UserCard
+                            key={user.id}
+                            user={user}
+                            onPress={() => router.push(`/user/${user.id}`)}
+                        />
+                    ))}
+                </ItemGroup>
+            )}
         </ItemList>
     );
 }

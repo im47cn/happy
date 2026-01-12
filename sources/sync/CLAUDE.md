@@ -41,3 +41,20 @@
 - `storageTypes.ts#Session`: 新增 `forkedFromSessionId`, `forkPointMessageId`, `forkCount` 字段
 - `apiTypes.ts#ApiUpdateForkSessionSchema`: fork-session 事件类型定义
 - `sync.ts#handleUpdate`: 处理 fork-session 实时事件，解密并添加新 session
+
+## Phase 7: Social Features
+
+**好友管理扩展:**
+- `friendTypes.ts`: 新增 `blocked` 状态，`isBlocked()` 工具函数
+- `apiFriends.ts`: 新增 `rejectFriendRequest`, `blockUser`, `unblockUser`, `getBlockedList` API
+
+**会话分享:**
+- `sessionShareTypes.ts`: 会话分享类型定义 (AccessLevel, SessionShareRecord, SharedSession)
+- `apiSessionShare.ts`: 会话分享 REST API 客户端
+
+**实时同步扩展:**
+- `sync.ts#handleUpdate`: 扩展 `new-feed-post` 处理，支持所有社交通知类型 (friend_rejected, session_shared, share_revoked, session_activity)
+- `feedTypes.ts`: 扩展 FeedBodySchema，新增社交通知类型定义
+
+**离线缓存:**
+- `socialCache.ts`: 社交数据离线缓存 (好友列表、分享会话列表)，24小时过期策略

@@ -89,6 +89,16 @@ export const ca: TranslationStructure = {
         hoursAgo: ({ count }: { count: number }) => `fa ${count} hora${count !== 1 ? 'es' : ''}`,
     },
 
+    connectionIndicator: {
+        title: 'Estat de la connexió',
+        server: 'Servidor',
+        defaultServer: 'Happy Server',
+        lastConnected: 'Última connexió',
+        lastDisconnected: 'Última desconnexió',
+        reconnect: 'Reconnectar',
+        reconnecting: 'Reconnectant...',
+    },
+
     connect: {
         restoreAccount: 'Restaura el compte',
         enterSecretKey: 'Introdueix la teva clau secreta',
@@ -247,6 +257,7 @@ export const ca: TranslationStructure = {
         failedToRemoveFriend: 'No s\'ha pogut eliminar l\'amic',
         searchFailed: 'La cerca ha fallat. Si us plau, torna-ho a provar.',
         failedToSendRequest: 'No s\'ha pogut enviar la sol·licitud d\'amistat',
+        notConnectedToServer: 'No connectat a la xarxa. Si us plau, comprova la teva connexió a internet.',
         // Phase 2: Remote control errors
         controlFailed: 'L\'operació de control ha fallat',
         pauseFailed: 'No s\'ha pogut pausar la sessió',
@@ -324,6 +335,26 @@ export const ca: TranslationStructure = {
         viewSession: 'Veure sessió',
     },
 
+    // Phase 2: Approval Dialog Modal
+    approvalDialog: {
+        approve: 'Aprovar',
+        reject: 'Rebutjar',
+        modify: 'Modificar',
+        confirmReject: 'Confirmar rebuig',
+        confirmModify: 'Confirmar modificació',
+        operation: 'Operació',
+        riskLevel: 'Nivell de risc',
+        requestedAt: 'Sol·licitat',
+        parameters: 'Paràmetres',
+        rejectReasonLabel: 'Motiu del rebuig (opcional)',
+        rejectReasonPlaceholder: 'Introdueix el motiu del rebuig...',
+        modifyParamsLabel: 'Paràmetres modificats (JSON)',
+        approveError: "Ha fallat l'aprovació. Si us plau, torneu-ho a provar.",
+        rejectError: 'Ha fallat el rebuig. Si us plau, torneu-ho a provar.',
+        modifyError: 'Ha fallat la modificació. Si us plau, torneu-ho a provar.',
+        invalidJson: 'Format JSON invàlid. Si us plau, comproveu la vostra entrada.',
+    },
+
     commandPalette: {
         placeholder: 'Escriu una comanda o cerca...',
     },
@@ -343,7 +374,16 @@ export const ca: TranslationStructure = {
         failedToConnectToServer: 'Ha fallat la connexió amb el servidor',
         currentlyUsingCustomServer: 'Actualment utilitzant un servidor personalitzat',
         customServerUrlLabel: 'URL del servidor personalitzat',
-        advancedFeatureFooter: 'Aquesta és una funció avançada. Només canvia el servidor si saps el que fas. Hauràs de tancar la sessió i tornar-la a iniciar després de canviar els servidors.'
+        advancedFeatureFooter: 'Aquesta és una funció avançada. Només canvia el servidor si saps el que fas. Hauràs de tancar la sessió i tornar-la a iniciar després de canviar els servidors.',
+        scanQrCode: 'Escaneja el codi QR',
+        protocolLabel: 'Protocol',
+        hostnameLabel: 'Nom d\'amfitrió / Adreça IP',
+        portLabel: 'Port',
+        testConnection: 'Prova la connexió',
+        connectionSuccess: 'Connexió correcta',
+        serverConfigScanned: 'Configuració del servidor escanejada correctament',
+        invalidQrCode: 'Format de codi QR no vàlid',
+        networkUnavailable: 'Xarxa no disponible. Comprova la teva connexió.',
     },
 
     sessionInfo: {
@@ -723,7 +763,8 @@ export const ca: TranslationStructure = {
         failedToConnectTerminal: 'Ha fallat connectar el terminal',
         cameraPermissionsRequiredToConnectTerminal: 'Es requereixen permisos de càmera per connectar el terminal',
         failedToLinkDevice: 'Ha fallat enllaçar el dispositiu',
-        cameraPermissionsRequiredToScanQr: 'Es requereixen permisos de càmera per escanejar codis QR'
+        cameraPermissionsRequiredToScanQr: 'Es requereixen permisos de càmera per escanejar codis QR',
+        cameraPermissionsRequired: 'Es requereixen permisos de càmera per escanejar codis QR',
     },
 
     navigation: {
@@ -742,6 +783,35 @@ export const ca: TranslationStructure = {
         createAccount: 'Crea un compte',
         linkOrRestoreAccount: 'Enllaça o restaura un compte',
         loginWithMobileApp: 'Inicia sessió amb l\'aplicació mòbil',
+    },
+
+    // Phase 6: Biometric Login
+    biometricLogin: {
+        title: 'Inici de sessió ràpid',
+        subtitle: 'Utilitza l\'autenticació biomètrica per accedir més ràpid',
+        faceId: 'Face ID',
+        touchId: 'Touch ID',
+        fingerprint: 'Empremta digital',
+        biometric: 'Biomètric',
+        loginWith: ({ type }: { type: string }) => `Inicia sessió amb ${type}`,
+        usePassword: 'Utilitza la contrasenya',
+        enableBiometric: 'Activa l\'inici de sessió biomètric',
+        authenticating: 'Autenticant...',
+        authenticationSuccess: 'Autenticació correcta',
+        authenticationFailed: 'Autenticació fallida',
+        notAvailable: 'L\'autenticació biomètrica no està disponible en aquest dispositiu',
+        notEnrolled: 'No hi ha dades biomètriques registrades. Configura la biometria a la configuració del dispositiu.',
+        noCredentials: 'No s\'han trobat credencials desades. Inicia sessió amb contrasenya primer.',
+        hardwareNotAvailable: 'El maquinari biomètric no està disponible',
+        cancelled: 'L\'autenticació s\'ha cancel·lat',
+        lockout: 'Massa intents fallits. Torna-ho a provar més tard.',
+        setupTitle: 'Activa l\'inici de sessió ràpid',
+        setupDescription: 'Vols activar l\'inici de sessió biomètric per accedir més ràpid la propera vegada?',
+        setupConfirm: 'Activa',
+        setupDecline: 'Ara no',
+        secureStorage: 'Les teves credencials s\'emmagatzemen de forma segura al clauer del dispositiu',
+        biometricEnabled: ({ type }: { type: string }) => `L'inici de sessió amb ${type} està activat`,
+        biometricDisabled: 'L\'inici de sessió biomètric està desactivat',
     },
 
     review: {
@@ -921,6 +991,7 @@ export const ca: TranslationStructure = {
             pending: 'Sol·licitud pendent',
             friend: 'Amics',
             rejected: 'Rebutjada',
+            blocked: 'Bloquejat',  // Phase 7
         },
         acceptRequest: 'Acceptar sol·licitud',
         removeFriend: 'Eliminar dels amics',
@@ -931,6 +1002,49 @@ export const ca: TranslationStructure = {
         cancelRequestConfirm: ({ name }: { name: string }) => `Cancel·lar la teva sol·licitud d\'amistat a ${name}?`,
         denyRequest: 'Rebutjar sol·licitud',
         nowFriendsWith: ({ name }: { name: string }) => `Ara ets amic de ${name}`,
+        // Phase 7: Blocked users
+        blockedUsers: 'Usuaris bloquejats',
+        noBlockedUsers: 'No hi ha usuaris bloquejats',
+        blockUser: 'Bloquejar usuari',
+        unblockUser: 'Desbloquejar usuari',
+        blockUserConfirm: ({ name }: { name: string }) => `Estàs segur que vols bloquejar ${name}? No podran veure les teves sessions ni enviar-te sol·licituds.`,
+        unblockUserConfirm: ({ name }: { name: string }) => `Estàs segur que vols desbloquejar ${name}?`,
+        userBlocked: ({ name }: { name: string }) => `${name} ha estat bloquejat`,
+        userUnblocked: ({ name }: { name: string }) => `${name} ha estat desbloquejat`,
+    },
+
+    // Phase 7: Session Sharing
+    sessionSharing: {
+        mySessions: 'Les meves sessions',
+        sharedWithMe: 'Compartides amb mi',
+        accessLevel: {
+            owner: 'Propietari',
+            view: 'Només lectura',
+            collaborate: 'Col·laborar',
+        },
+        shareSession: 'Compartir sessió',
+        shareWith: ({ name }: { name: string }) => `Compartir amb ${name}`,
+        manageSharing: 'Gestionar compartició',
+        viewDescription: 'Només lectura, sense enviar missatges',
+        collaborateDescription: 'Lectura i enviament de missatges',
+        selectFriend: 'Selecciona un amic per compartir',
+        selectPermission: 'Selecciona el nivell de permís',
+        noFriendsToShare: 'Afegeix amics primer per compartir sessions amb ells',
+        sharedBy: ({ name }: { name: string }) => `Compartida per ${name}`,
+        sharedWith: ({ name }: { name: string }) => `Compartida amb ${name}`,
+        sharedWithCount: ({ count }: { count: number }) => `Compartida amb ${count} ${count === 1 ? 'persona' : 'persones'}`,
+        noSharedSessions: 'Encara no s\'han compartit sessions amb tu',
+        collaborators: 'Col·laboradors',
+        noCollaborators: 'Aquesta sessió no està compartida amb ningú',
+        changePermission: 'Canviar permís',
+        revokeAccess: 'Revocar accés',
+        revokeAccessConfirm: ({ name }: { name: string }) => `Estàs segur que vols revocar l'accés de ${name} a aquesta sessió?`,
+        shareCreated: ({ name }: { name: string }) => `Sessió compartida amb ${name}`,
+        shareUpdated: ({ name }: { name: string }) => `Permís actualitzat per a ${name}`,
+        shareRevoked: ({ name }: { name: string }) => `Accés revocat per a ${name}`,
+        shareError: 'No s\'ha pogut compartir la sessió',
+        readOnlyMode: 'Només lectura',
+        readOnlyDescription: 'Pots veure aquesta sessió però no pots enviar missatges',
     },
 
     usage: {
@@ -953,6 +1067,16 @@ export const ca: TranslationStructure = {
         friendRequestGeneric: 'Nova sol·licitud d\'amistat',
         friendAccepted: ({ name }: { name: string }) => `Ara ets amic de ${name}`,
         friendAcceptedGeneric: 'Sol·licitud d\'amistat acceptada',
+        // Phase 7: Extended notification types
+        unknownUser: 'Usuari desconegut',
+        session: 'Sessió',
+        friendRequestAcceptedConfirm: ({ name }: { name: string }) => `Ara ets amic de ${name}`,
+        friendRequestRejectedConfirm: ({ name }: { name: string }) => `Sol·licitud d'amistat de ${name} rebutjada`,
+        friendRejected: ({ name }: { name: string }) => `${name} ha rebutjat la teva sol·licitud d'amistat`,
+        sessionShared: ({ name }: { name: string }) => `${name} ha compartit una sessió amb tu`,
+        sharePermissionChanged: ({ sessionTitle, accessLevel }: { sessionTitle: string; accessLevel: string }) => `Permís canviat a ${accessLevel} per a "${sessionTitle}"`,
+        shareRevoked: ({ name, sessionTitle }: { name: string; sessionTitle: string }) => `${name} ha revocat el teu accés a "${sessionTitle}"`,
+        sessionActivity: ({ name, sessionTitle }: { name: string; sessionTitle: string }) => `${name} ha enviat un missatge a "${sessionTitle}"`,
     },
     settingsNotifications: {
         // Notifications settings screen

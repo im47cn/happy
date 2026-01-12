@@ -91,6 +91,16 @@ export const zhHans: TranslationStructure = {
         hoursAgo: ({ count }: { count: number }) => `${count} 小时前`,
     },
 
+    connectionIndicator: {
+        title: '连接状态',
+        server: '服务器',
+        defaultServer: 'Happy Server',
+        lastConnected: '上次连接',
+        lastDisconnected: '上次断开',
+        reconnect: '重新连接',
+        reconnecting: '正在重连...',
+    },
+
     connect: {
         restoreAccount: '恢复账户',
         enterSecretKey: '请输入密钥',
@@ -300,6 +310,7 @@ export const zhHans: TranslationStructure = {
         failedToRemoveFriend: '删除好友失败',
         searchFailed: '搜索失败。请重试。',
         failedToSendRequest: '发送好友请求失败',
+        notConnectedToServer: '未连接到网络。请检查您的网络连接。',
         // Phase 2: Remote control errors
         controlFailed: '控制操作失败',
         pauseFailed: '暂停会话失败',
@@ -377,6 +388,26 @@ export const zhHans: TranslationStructure = {
         viewSession: '查看会话',
     },
 
+    // Phase 2: Approval Dialog Modal
+    approvalDialog: {
+        approve: '批准',
+        reject: '拒绝',
+        modify: '修改',
+        confirmReject: '确认拒绝',
+        confirmModify: '确认修改',
+        operation: '操作',
+        riskLevel: '风险级别',
+        requestedAt: '请求时间',
+        parameters: '参数',
+        rejectReasonLabel: '拒绝原因（可选）',
+        rejectReasonPlaceholder: '请输入拒绝原因...',
+        modifyParamsLabel: '修改参数（JSON 格式）',
+        approveError: '批准失败，请重试。',
+        rejectError: '拒绝失败，请重试。',
+        modifyError: '修改失败，请重试。',
+        invalidJson: 'JSON 格式无效，请检查输入。',
+    },
+
     commandPalette: {
         placeholder: '输入命令或搜索...',
     },
@@ -396,7 +427,16 @@ export const zhHans: TranslationStructure = {
         failedToConnectToServer: '连接服务器失败',
         currentlyUsingCustomServer: '当前使用自定义服务器',
         customServerUrlLabel: '自定义服务器 URL',
-        advancedFeatureFooter: "这是一个高级功能。只有在您知道自己在做什么时才更改服务器。更改服务器后您需要重新登录。"
+        advancedFeatureFooter: "这是一个高级功能。只有在您知道自己在做什么时才更改服务器。更改服务器后您需要重新登录。",
+        scanQrCode: '扫描二维码',
+        protocolLabel: '协议',
+        hostnameLabel: '主机名 / IP 地址',
+        portLabel: '端口',
+        testConnection: '测试连接',
+        connectionSuccess: '连接成功',
+        serverConfigScanned: '服务器配置扫描成功',
+        invalidQrCode: '二维码格式无效',
+        networkUnavailable: '网络不可用。请检查您的连接。',
     },
 
     sessionInfo: {
@@ -776,7 +816,8 @@ export const zhHans: TranslationStructure = {
         failedToConnectTerminal: '连接终端失败',
         cameraPermissionsRequiredToConnectTerminal: '连接终端需要相机权限',
         failedToLinkDevice: '链接设备失败',
-        cameraPermissionsRequiredToScanQr: '扫描二维码需要相机权限'
+        cameraPermissionsRequiredToScanQr: '扫描二维码需要相机权限',
+        cameraPermissionsRequired: '扫描二维码需要相机权限',
     },
 
     navigation: {
@@ -795,6 +836,35 @@ export const zhHans: TranslationStructure = {
         createAccount: '创建账户',
         linkOrRestoreAccount: '链接或恢复账户',
         loginWithMobileApp: '使用移动应用登录',
+    },
+
+    // Phase 6: Biometric Login
+    biometricLogin: {
+        title: '快速登录',
+        subtitle: '使用生物识别认证以更快登录',
+        faceId: 'Face ID',
+        touchId: 'Touch ID',
+        fingerprint: '指纹',
+        biometric: '生物识别',
+        loginWith: ({ type }: { type: string }) => `使用 ${type} 登录`,
+        usePassword: '使用密码登录',
+        enableBiometric: '启用生物识别登录',
+        authenticating: '认证中...',
+        authenticationSuccess: '认证成功',
+        authenticationFailed: '认证失败',
+        notAvailable: '此设备不支持生物识别认证',
+        notEnrolled: '未注册生物识别数据，请在设备设置中设置生物识别',
+        noCredentials: '未找到已保存的凭证，请先使用密码登录',
+        hardwareNotAvailable: '生物识别硬件不可用',
+        cancelled: '认证已取消',
+        lockout: '尝试次数过多，请稍后再试',
+        setupTitle: '启用快速登录',
+        setupDescription: '是否要启用生物识别登录以便下次更快登录？',
+        setupConfirm: '启用',
+        setupDecline: '暂不启用',
+        secureStorage: '您的凭证已安全存储在设备钥匙串中',
+        biometricEnabled: ({ type }: { type: string }) => `${type} 登录已启用`,
+        biometricDisabled: '生物识别登录已禁用',
     },
 
     review: {
@@ -974,6 +1044,7 @@ export const zhHans: TranslationStructure = {
             pending: '请求待处理',
             friend: '好友',
             rejected: '已拒绝',
+            blocked: '已屏蔽',  // Phase 7
         },
         acceptRequest: '接受请求',
         removeFriend: '移除好友',
@@ -984,6 +1055,49 @@ export const zhHans: TranslationStructure = {
         cancelRequestConfirm: ({ name }: { name: string }) => `取消发送给 ${name} 的好友请求？`,
         denyRequest: '拒绝请求',
         nowFriendsWith: ({ name }: { name: string }) => `您现在与 ${name} 是好友了`,
+        // Phase 7: Blocked users
+        blockedUsers: '已屏蔽用户',
+        noBlockedUsers: '没有已屏蔽的用户',
+        blockUser: '屏蔽用户',
+        unblockUser: '取消屏蔽',
+        blockUserConfirm: ({ name }: { name: string }) => `确定要屏蔽 ${name} 吗？他们将无法看到您的会话或向您发送请求。`,
+        unblockUserConfirm: ({ name }: { name: string }) => `确定要取消屏蔽 ${name} 吗？`,
+        userBlocked: ({ name }: { name: string }) => `${name} 已被屏蔽`,
+        userUnblocked: ({ name }: { name: string }) => `${name} 已取消屏蔽`,
+    },
+
+    // Phase 7: Session Sharing
+    sessionSharing: {
+        mySessions: '我的会话',
+        sharedWithMe: '共享给我的',
+        accessLevel: {
+            owner: '所有者',
+            view: '仅查看',
+            collaborate: '协作',
+        },
+        shareSession: '分享会话',
+        shareWith: ({ name }: { name: string }) => `分享给 ${name}`,
+        manageSharing: '管理分享',
+        viewDescription: '可查看但不能发送消息',
+        collaborateDescription: '可查看和发送消息',
+        selectFriend: '选择要分享的好友',
+        selectPermission: '选择权限级别',
+        noFriendsToShare: '请先添加好友才能分享会话',
+        sharedBy: ({ name }: { name: string }) => `由 ${name} 分享`,
+        sharedWith: ({ name }: { name: string }) => `已分享给 ${name}`,
+        sharedWithCount: ({ count }: { count: number }) => `已分享给 ${count} 人`,
+        noSharedSessions: '暂无共享给您的会话',
+        collaborators: '协作者',
+        noCollaborators: '此会话未与任何人分享',
+        changePermission: '更改权限',
+        revokeAccess: '撤销访问',
+        revokeAccessConfirm: ({ name }: { name: string }) => `确定要撤销 ${name} 对此会话的访问权限吗？`,
+        shareCreated: ({ name }: { name: string }) => `会话已分享给 ${name}`,
+        shareUpdated: ({ name }: { name: string }) => `${name} 的权限已更新`,
+        shareRevoked: ({ name }: { name: string }) => `已撤销 ${name} 的访问权限`,
+        shareError: '分享会话失败',
+        readOnlyMode: '仅查看',
+        readOnlyDescription: '您可以查看此会话但无法发送消息',
     },
 
     usage: {
@@ -1006,6 +1120,16 @@ export const zhHans: TranslationStructure = {
         friendRequestGeneric: '新的好友请求',
         friendAccepted: ({ name }: { name: string }) => `您现在与 ${name} 成为了好友`,
         friendAcceptedGeneric: '好友请求已接受',
+        // Phase 7: Extended notification types
+        unknownUser: '未知用户',
+        session: '会话',
+        friendRequestAcceptedConfirm: ({ name }: { name: string }) => `您现在与 ${name} 成为了好友`,
+        friendRequestRejectedConfirm: ({ name }: { name: string }) => `已拒绝 ${name} 的好友请求`,
+        friendRejected: ({ name }: { name: string }) => `${name} 拒绝了您的好友请求`,
+        sessionShared: ({ name }: { name: string }) => `${name} 与您分享了一个会话`,
+        sharePermissionChanged: ({ sessionTitle, accessLevel }: { sessionTitle: string; accessLevel: string }) => `"${sessionTitle}" 的权限已更改为 ${accessLevel}`,
+        shareRevoked: ({ name, sessionTitle }: { name: string; sessionTitle: string }) => `${name} 撤销了您对 "${sessionTitle}" 的访问权限`,
+        sessionActivity: ({ name, sessionTitle }: { name: string; sessionTitle: string }) => `${name} 在 "${sessionTitle}" 中发送了消息`,
     },
 
     voice: {

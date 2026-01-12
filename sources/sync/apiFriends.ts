@@ -214,3 +214,133 @@ export async function removeFriend(
         return parsed.data.user;
     });
 }
+
+// === PHASE 7: FRIEND MANAGEMENT EXTENSIONS ===
+
+/**
+ * Reject a friend request (Phase 7)
+ * @param credentials - Auth credentials
+ * @param userId - User ID whose request to reject
+ * @returns true if successful, false otherwise
+ */
+export async function rejectFriendRequest(
+    credentials: AuthCredentials,
+    userId: string
+): Promise<boolean> {
+    const API_ENDPOINT = getServerUrl();
+
+    return await backoff(async () => {
+        const response = await fetch(`${API_ENDPOINT}/v1/friends/reject`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${credentials.token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ uid: userId })
+        });
+
+        if (!response.ok) {
+            console.error(`Failed to reject friend request: ${response.status}`);
+            return false;
+        }
+
+        return true;
+    });
+}
+
+/**
+ * Block a user (Phase 7)
+ * Removes friendship if exists and prevents future interactions
+ * @param credentials - Auth credentials
+ * @param userId - User ID to block
+ * @returns true if successful, false otherwise
+ */
+export async function blockUser(
+    credentials: AuthCredentials,
+    userId: string
+): Promise<boolean> {
+    const API_ENDPOINT = getServerUrl();
+
+    return await backoff(async () => {
+        const response = await fetch(`${API_ENDPOINT}/v1/friends/block`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${credentials.token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ uid: userId })
+        });
+
+        if (!response.ok) {
+            console.error(`Failed to block user: ${response.status}`);
+            return false;
+        }
+
+        return true;
+    });
+}
+
+/**
+ * Unblock a user (Phase 7)
+ * @param credentials - Auth credentials
+ * @param userId - User ID to unblock
+ * @returns true if successful, false otherwise
+ */
+export async function unblockUser(
+    credentials: AuthCredentials,
+    userId: string
+): Promise<boolean> {
+    const API_ENDPOINT = getServerUrl();
+
+    return await backoff(async () => {
+        const response = await fetch(`${API_ENDPOINT}/v1/friends/unblock`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${credentials.token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ uid: userId })
+        });
+
+        if (!response.ok) {
+            console.error(`Failed to unblock user: ${response.status}`);
+            return false;
+        }
+
+        return true;
+    });
+}
+
+/**
+ * Get list of blocked users (Phase 7)
+ * @param credentials - Auth credentials
+ * @returns Array of blocked user profiles
+ */
+export async function getBlockedList(
+    credentials: AuthCredentials
+): Promise<UserProfile[]> {
+    const API_ENDPOINT = getServerUrl();
+
+    return await backoff(async () => {
+        const response = await fetch(`${API_ENDPOINT}/v1/friends/blocked`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${credentials.token}`
+            }
+        });
+
+        if (!response.ok) {
+            console.error(`Failed to get blocked list: ${response.status}`);
+            return [];
+        }
+
+        const data = await response.json();
+        const parsed = FriendsResponseSchema.safeParse({ friends: data.users });
+        if (!parsed.success) {
+            console.error('Failed to parse blocked list:', parsed.error);
+            return [];
+        }
+
+        return parsed.data.friends;
+    });
+}
