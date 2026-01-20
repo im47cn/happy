@@ -5,6 +5,7 @@ import { ChatHeaderView } from '@/components/ChatHeaderView';
 import { ChatList } from '@/components/ChatList';
 import { Deferred } from '@/components/Deferred';
 import { EmptyMessages } from '@/components/EmptyMessages';
+import { SessionAccessBadge } from '@/components/SessionAccessBadge';
 import { hapticsLight } from '@/components/haptics';
 import { VoiceAssistantStatusBar } from '@/components/VoiceAssistantStatusBar';
 import { useDraft } from '@/hooks/useDraft';
@@ -24,17 +25,29 @@ import { useDeviceType, useHeaderHeight, useIsLandscape, useIsTablet } from '@/u
 import { formatPathRelativeToHome, getSessionAvatarId, getSessionName, useSessionStatus } from '@/utils/sessionUtils';
 import { isVersionSupported, MINIMUM_CLI_VERSION } from '@/utils/versionUtils';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
 import { useMemo } from 'react';
 import { ActivityIndicator, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useUnistyles } from 'react-native-unistyles';
 
+/**
+ * @file SessionView.tsx
+ * @input sessionId, accessLevel (optional query param for shared sessions)
+ * @output Main session detail/chat view with Phase 7 access control
+ * @pos Session detail page with sharing features and permission-based UI (Phase 7)
+ */
+
 export const SessionView = React.memo((props: { id: string }) => {
     const sessionId = props.id;
     const router = useRouter();
     const session = useSession(sessionId);
+
+    // Phase 7: Read accessLevel from query params (default to 'owner' for own sessions)
+    const searchParams = useLocalSearchParams<{ accessLevel?: 'owner' | 'view' | 'collaborate' }>();
+    const accessLevel = searchParams.accessLevel || 'owner';
+
     const isDataReady = useIsDataReady();
     const { theme } = useUnistyles();
     const safeArea = useSafeAreaInsets();
@@ -119,6 +132,41 @@ export const SessionView = React.memo((props: { id: string }) => {
                         {...headerProps}
                         onBackPress={() => router.back()}
                     />
+                    {/* Phase 7: Access badge and share management */}
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingHorizontal: 16,
+                        paddingBottom: 8,
+                        backgroundColor: theme.colors.surface,
+                        gap: 8
+                    }}>
+                        <SessionAccessBadge accessLevel={accessLevel} size="small" />
+                        {accessLevel === 'owner' && (
+                            <Pressable
+                                testID="session-manage-shares"
+                                onPress={() => router.push(`/session/${sessionId}/shares`)}
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                    paddingHorizontal: 10,
+                                    paddingVertical: 4,
+                                    backgroundColor: theme.colors.button.primary.background + '20',
+                                    borderRadius: 16
+                                }}
+                            >
+                                <Ionicons name="people" size={14} color={theme.colors.button.primary.tint} />
+                                <Text style={{
+                                    fontSize: 12,
+                                    color: theme.colors.button.primary.tint,
+                                    fontWeight: '600'
+                                }}>
+                                    {t('sessionSharing.manageSharing')}
+                                </Text>
+                            </Pressable>
+                        )}
+                    </View>
                     {/* Voice status bar below header - not on tablet (shown in sidebar) */}
                     {!isTablet && realtimeStatus !== 'disconnected' && (
                         <VoiceAssistantStatusBar variant="full" />
@@ -127,7 +175,12 @@ export const SessionView = React.memo((props: { id: string }) => {
             )}
 
             {/* Content based on state */}
-            <View style={{ flex: 1, paddingTop: !(isLandscape && deviceType === 'phone') ? safeArea.top + headerHeight + (!isTablet && realtimeStatus !== 'disconnected' ? 48 : 0) : 0 }}>
+            <View style={{
+                flex: 1,
+                paddingTop: !(isLandscape && deviceType === 'phone')
+                    ? safeArea.top + headerHeight + 40 + (!isTablet && realtimeStatus !== 'disconnected' ? 48 : 0)
+                        : 0
+            }}>
                 {!isDataReady ? (
                     // Loading state
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -142,7 +195,7 @@ export const SessionView = React.memo((props: { id: string }) => {
                     </View>
                 ) : (
                     // Normal session view
-                    <SessionViewLoaded key={sessionId} sessionId={sessionId} session={session} />
+                    <SessionViewLoaded key={sessionId} sessionId={sessionId} session={session} accessLevel={accessLevel} />
                 )}
             </View>
         </>
@@ -150,7 +203,15 @@ export const SessionView = React.memo((props: { id: string }) => {
 });
 
 
-function SessionViewLoaded({ sessionId, session }: { sessionId: string, session: Session }) {
+function SessionViewLoaded({
+    sessionId,
+    session,
+    accessLevel
+}: {
+    sessionId: string,
+    session: Session,
+    accessLevel: 'owner' | 'view' | 'collaborate'
+}) {
     const { theme } = useUnistyles();
     const router = useRouter();
     const safeArea = useSafeAreaInsets();
@@ -371,6 +432,14 @@ function SessionViewLoaded({ sessionId, session }: { sessionId: string, session:
                 isPulsing: sessionStatus.isPulsing
             }}
             onSend={() => {
+                // Phase 7: View-only users cannot send messages
+                if (accessLevel === 'view') {
+                    Modal.alert(
+                        t('sessionSharing.readOnlyMode'),
+                        t('sessionSharing.readOnlyDescription')
+                    );
+                    return;
+                }
                 if (message.trim()) {
                     setMessage('');
                     clearDraft();
@@ -378,8 +447,8 @@ function SessionViewLoaded({ sessionId, session }: { sessionId: string, session:
                     trackMessageSent();
                 }
             }}
-            onMicPress={micButtonState.onMicPress}
-            isMicActive={micButtonState.isMicActive}
+            onMicPress={accessLevel === 'view' ? undefined : micButtonState.onMicPress}
+            isMicActive={accessLevel === 'view' ? false : micButtonState.isMicActive}
             onAbort={() => sessionAbort(sessionId)}
             showAbortButton={sessionStatus.state === 'thinking' || sessionStatus.state === 'waiting'}
             onFileViewerPress={experiments ? () => router.push(`/session/${sessionId}/files`) : undefined}

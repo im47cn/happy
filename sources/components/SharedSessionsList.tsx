@@ -81,7 +81,7 @@ export const SharedSessionsList = React.memo(() => {
     const renderItem = React.useCallback(({ item }: { item: SharedSession }) => (
         <SharedSessionItem
             session={item}
-            onPress={() => navigateToSession(item.id)}
+            onPress={() => navigateToSession(item.id, item.accessLevel)}
         />
     ), [navigateToSession]);
 
