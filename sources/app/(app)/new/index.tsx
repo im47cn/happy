@@ -210,11 +210,12 @@ function NewSessionScreen() {
     // Agent selection
     //
 
-    const [agentType, setAgentType] = React.useState<'claude' | 'codex' | 'gemini'>(() => {
+    const [agentType, setAgentType] = React.useState<'claude' | 'codex' | 'gemini' | 'hermes' | 'crush'>(() => {
         // Check if agent type was provided in temp data
         if (tempSessionData?.agentType) {
-            // Only allow gemini if experiments are enabled
-            if (tempSessionData.agentType === 'gemini' && !experimentsEnabled) {
+            // Only allow non-claude/codex if experiments are enabled
+            const experimentalAgent = ['gemini', 'hermes', 'crush'].includes(tempSessionData.agentType);
+            if (experimentalAgent && !experimentsEnabled) {
                 return 'claude';
             }
             return tempSessionData.agentType;
@@ -223,24 +224,21 @@ function NewSessionScreen() {
         if (lastUsedAgent === 'claude' || lastUsedAgent === 'codex') {
             return lastUsedAgent;
         }
-        // Only allow gemini if experiments are enabled
-        if (lastUsedAgent === 'gemini' && experimentsEnabled) {
-            return lastUsedAgent;
+        // Only allow experimental agents if experiments are enabled
+        if (['gemini', 'hermes', 'crush'].includes(lastUsedAgent as string) && experimentsEnabled) {
+            return lastUsedAgent as 'gemini' | 'hermes' | 'crush';
         }
         return 'claude';
     });
 
     const handleAgentClick = React.useCallback(() => {
         setAgentType(prev => {
-            // Cycle: claude -> codex -> gemini (if experiments) -> claude
-            let newAgent: 'claude' | 'codex' | 'gemini';
-            if (prev === 'claude') {
-                newAgent = 'codex';
-            } else if (prev === 'codex') {
-                newAgent = experimentsEnabled ? 'gemini' : 'claude';
-            } else {
-                newAgent = 'claude';
-            }
+            // Cycle: claude -> codex -> gemini -> hermes -> crush (if experiments) -> claude
+            const cycle: Array<'claude' | 'codex' | 'gemini' | 'hermes' | 'crush'> = experimentsEnabled
+                ? ['claude', 'codex', 'gemini', 'hermes', 'crush']
+                : ['claude', 'codex'];
+            const currentIdx = cycle.indexOf(prev);
+            const newAgent = cycle[(currentIdx + 1) % cycle.length];
             // Save the new selection immediately
             sync.applySettings({ lastUsedAgent: newAgent });
             return newAgent;
@@ -259,7 +257,7 @@ function NewSessionScreen() {
         if (lastUsedPermissionMode) {
             if (agentType === 'codex' && validCodexModes.includes(lastUsedPermissionMode as PermissionMode)) {
                 return lastUsedPermissionMode as PermissionMode;
-            } else if ((agentType === 'claude' || agentType === 'gemini') && validClaudeGeminiModes.includes(lastUsedPermissionMode as PermissionMode)) {
+            } else if ((agentType === 'claude' || agentType === 'gemini' || agentType === 'hermes' || agentType === 'crush') && validClaudeGeminiModes.includes(lastUsedPermissionMode as PermissionMode)) {
                 return lastUsedPermissionMode as PermissionMode;
             }
         }
