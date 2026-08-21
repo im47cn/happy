@@ -11,7 +11,13 @@ import {
     forkAndSpawn,
     claudeListRewindPoints,
     codexListRewindPoints,
+    crushListRewindPoints,
+    hermesListRewindPoints,
+    type ClaudeListRewindPointsResult,
+    type CodexListRewindPointsResult,
+    type CrushListRewindPointsResult,
     type ForkSource,
+    type HermesListRewindPointsResult,
 } from '@/sync/ops';
 import { getSessionForkSource } from '@/utils/sessionFork';
 import { MobileGlassSurface } from './MobileGlass';
@@ -60,6 +66,8 @@ export const DuplicateSheet = React.memo(function DuplicateSheet(props: Duplicat
         session?.metadata?.path,
         session?.metadata?.claudeSessionId,
         session?.metadata?.codexThreadId,
+        session?.metadata?.crushSessionId,
+        session?.metadata?.acpSessionId,
     ]);
     const canFork = Boolean(source);
 
@@ -78,22 +86,37 @@ export const DuplicateSheet = React.memo(function DuplicateSheet(props: Duplicat
                 }
                 return;
             }
-            const result = source.kind === 'codex'
-                ? await codexListRewindPoints({
+            let result: CodexListRewindPointsResult | CrushListRewindPointsResult | HermesListRewindPointsResult | ClaudeListRewindPointsResult;
+            if (source.kind === 'codex') {
+                result = await codexListRewindPoints({
                     machineId: source.machineId,
                     directory: source.directory,
                     codexThreadId: source.codexThreadId,
-                })
-                : await claudeListRewindPoints({
+                });
+            } else if (source.kind === 'crush') {
+                result = await crushListRewindPoints({
+                    machineId: source.machineId,
+                    directory: source.directory,
+                    crushSessionId: source.crushSessionId,
+                });
+            } else if (source.kind === 'hermes') {
+                result = await hermesListRewindPoints({
+                    machineId: source.machineId,
+                    directory: source.directory,
+                    acpSessionId: source.acpSessionId,
+                });
+            } else {
+                result = await claudeListRewindPoints({
                     machineId: source.machineId,
                     directory: source.directory,
                     claudeSessionId: source.claudeSessionId,
                 });
+            }
             if (cancelled) return;
             if (result.type === 'success') {
                 // Newest first — easier to find a recent rewind point.
                 const normalized = result.points.map((point) => ({
-                    id: 'itemId' in point ? point.itemId : point.uuid,
+                    id: 'itemId' in point ? point.itemId : 'uuid' in point ? point.uuid : point.id,
                     text: point.text,
                     timestamp: point.timestamp,
                 }));
@@ -142,15 +165,28 @@ export const DuplicateSheet = React.memo(function DuplicateSheet(props: Duplicat
         const forkedFromMessageId = matchesInitialSelection(selected, initialSelectedId, initialMessageText)
             ? initialForkedFromMessageId
             : undefined;
+        // Crush rewind-point ids are UUID strings (kept as-is); Hermes ids
+        // are numeric on the daemon side — the sheet normalizes every
+        // provider id to string, so convert back for Hermes only.
         const result = source.kind === 'codex'
             ? await forkAndSpawn(source as ForkSource, {
                 cutAfterItemId: selected.id,
                 forkedFromMessageId,
             })
-            : await forkAndSpawn(source as ForkSource, {
-                cutAfterUuid: selected.id,
-                forkedFromMessageId,
-            });
+            : source.kind === 'claude'
+                ? await forkAndSpawn(source as ForkSource, {
+                    cutAfterUuid: selected.id,
+                    forkedFromMessageId,
+                })
+                : source.kind === 'crush'
+                    ? await forkAndSpawn(source as ForkSource, {
+                        cutAfterCrushMessageId: selected.id,
+                        forkedFromMessageId,
+                    })
+                    : await forkAndSpawn(source as ForkSource, {
+                        cutAfterHermesMessageId: Number(selected.id),
+                        forkedFromMessageId,
+                    });
 
         if (result.type === 'success') {
             onClose?.();

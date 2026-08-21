@@ -370,6 +370,7 @@ Conversation history is preserved on the server, but in-flight tool calls are in
 
       let startedBy: 'daemon' | 'terminal' | undefined = undefined;
       let verbose = false;
+      let resumeSessionId: string | undefined = undefined;
       const acpArgs: string[] = [];
       let customCommandMode = false;
       for (let i = 1; i < args.length; i++) {
@@ -385,6 +386,12 @@ Conversation history is preserved on the server, but in-flight tool calls are in
         }
         if (!customCommandMode && args[i] === '--verbose') {
           verbose = true;
+          continue;
+        }
+        if (!customCommandMode && args[i] === '--resume') {
+          // Happy-internal flag appended by the daemon for the fork /
+          // duplicate flow; consume it so it never reaches the agent subprocess
+          resumeSessionId = args[++i];
           continue;
         }
         if (args[i] === '--') {
@@ -404,6 +411,7 @@ Conversation history is preserved on the server, but in-flight tool calls are in
         agentName: resolved.agentName,
         command: resolved.command,
         args: resolved.args,
+        resumeSessionId,
       });
     } catch (error) {
       console.error(chalk.red('Error:'), error instanceof Error ? error.message : 'Unknown error')
@@ -420,11 +428,14 @@ Conversation history is preserved on the server, but in-flight tool calls are in
 
       let startedBy: 'daemon' | 'terminal' | undefined = undefined;
       let verbose = false;
+      let resumeSessionId: string | undefined = undefined;
       for (let i = 1; i < args.length; i++) {
         if (args[i] === '--started-by') {
           startedBy = args[++i] as 'daemon' | 'terminal';
         } else if (args[i] === '--verbose') {
           verbose = true;
+        } else if (args[i] === '--resume') {
+          resumeSessionId = args[++i];
         }
       }
 
@@ -440,6 +451,7 @@ Conversation history is preserved on the server, but in-flight tool calls are in
           createCrushBackend({
             cwd: process.cwd(),
             mcpServers: context.mcpServers,
+            resumeSessionId,
           }),
         externalPermissions: true,
       });

@@ -370,6 +370,11 @@ export async function startDaemon(): Promise<void> {
         if (options.resumeCodexThreadId) {
           extraEnv.HAPPY_FORK_CODEX_THREAD_ID = options.resumeCodexThreadId;
         }
+        // Agent-agnostic resume id (crush/hermes): the spawned CLI receives
+        // it as --resume and the backend resumes the forked agent session.
+        if (options.resumeAgentSessionId) {
+          extraEnv.HAPPY_FORK_AGENT_SESSION_ID = options.resumeAgentSessionId;
+        }
         logger.debug(`[DAEMON RUN] Environment variable keys (before expansion) (${Object.keys(extraEnv).length}): ${Object.keys(extraEnv).join(', ')}`);
 
         // Expand ${VAR} references from the sanitized daemon environment.
@@ -437,9 +442,16 @@ export async function startDaemon(): Promise<void> {
           const cliPath = join(projectPath(), 'dist', 'index.mjs');
           // Determine agent command; undefined falls back to claude (matching the regular-spawn path)
           const agent = options.agent ?? 'claude';
-          const resumeId = agent === 'claude'
-            ? options.resumeClaudeSessionId
-            : (agent === 'codex' ? options.resumeCodexThreadId : undefined);
+          // Resume ids attach the new Happy session to a pre-existing agent
+          // conversation created by the fork / duplicate RPC.
+          let resumeId: string | undefined;
+          if (agent === 'claude') {
+            resumeId = options.resumeClaudeSessionId;
+          } else if (agent === 'codex') {
+            resumeId = options.resumeCodexThreadId;
+          } else if (agent === 'crush' || agent === 'hermes') {
+            resumeId = options.resumeAgentSessionId;
+          }
           const resumeFragment = resumeId
             ? ` --resume ${shellescape(resumeId)}`
             : '';
@@ -576,6 +588,9 @@ export async function startDaemon(): Promise<void> {
           }
           if (options.resumeCodexThreadId && agentCommand === 'codex') {
             args.push('--resume', options.resumeCodexThreadId);
+          }
+          if (options.resumeAgentSessionId && (agentCommand === 'crush' || agentCommand === 'hermes')) {
+            args.push('--resume', options.resumeAgentSessionId);
           }
 
           // TODO: In future, sessionId could be used with --resume to continue existing sessions

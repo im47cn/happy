@@ -4,6 +4,8 @@
  */
 
 import { io, Socket } from 'socket.io-client';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { logger } from '@/ui/logger';
 import { configuration } from '@/configuration';
 import { MachineMetadata, DaemonState, Machine, Update, UpdateMachineBody } from './types';
@@ -22,6 +24,20 @@ import {
     ForkTruncateUuidNotFoundError,
     ForkSourceMissingError,
 } from '@/claude/utils/claudeSessionFork';
+import {
+    forkCrushSession,
+    forkAndTruncateCrushSession,
+    listCrushRewindPoints,
+    ForkSourceMissingError as CrushForkSourceMissingError,
+    ForkTruncateIdNotFoundError as CrushForkTruncateIdNotFoundError,
+} from '@/agent/crush/crushSessionFork';
+import {
+    forkHermesSession,
+    forkAndTruncateHermesSession,
+    listHermesRewindPoints,
+    ForkSourceMissingError as HermesForkSourceMissingError,
+    ForkTruncateIdNotFoundError as HermesForkTruncateIdNotFoundError,
+} from '@/agent/hermes/hermesSessionFork';
 import { CodexAppServerClient } from '@/codex/codexAppServerClient';
 import {
     CodexForkRewindPointNotFoundError,
@@ -30,6 +46,43 @@ import {
 } from '@/codex/codexThreadFork';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Crush stores its database per project directory. */
+function crushDbPath(directory: string): string {
+    return join(directory, '.crush', 'crush.db');
+}
+
+/** Hermes keeps one machine-global state db (HAPPY_HERMES_HOME overrides for tests). */
+function hermesDbPath(): string {
+    return join(process.env.HAPPY_HERMES_HOME ?? join(homedir(), '.hermes'), 'state.db');
+}
+
+/**
+ * Map agent-fork module errors onto user-facing RPC messages — the SQLite
+ * counterpart of the Claude JSONL handlers' error contract.
+ */
+function rethrowMappedAgentForkError(
+    error: unknown,
+    sourceMissingCtor: abstract new (...args: never[]) => Error,
+    truncateMissingCtor?: abstract new (...args: never[]) => Error,
+): never {
+    if (error instanceof sourceMissingCtor) {
+        throw new Error('session database not found on this machine');
+    }
+    if (truncateMissingCtor && error instanceof truncateMissingCtor) {
+        throw new Error('chosen rewind point no longer present');
+    }
+    throw error;
+}
+
+/** Validate a numeric message id coming from the app (number or numeric string). */
+function requireMessageId(value: unknown, name: string): number {
+    const parsed = typeof value === 'number' ? value : Number(value);
+    if (!Number.isSafeInteger(parsed) || parsed < 1) {
+        throw new Error(`${name} must be a positive integer`);
+    }
+    return parsed;
+}
 
 interface ServerToDaemonEvents {
     update: (data: Update) => void;
@@ -267,6 +320,82 @@ export class ApiMachineClient {
                     );
                 }
                 throw error;
+            }
+        });
+
+        // Crush / Hermes session fork handlers — SQLite counterparts of the
+        // Claude JSONL forks above. They copy the agent's own session rows
+        // (optionally truncated at a chosen message) and return the new agent
+        // session id; the caller then spawns a fresh Happy session with
+        // resumeAgentSessionId set so the agent resumes the forked
+        // conversation. Hermes ignores `directory`: its state db is
+        // machine-global rather than per-project.
+        this.rpcHandlerManager.registerHandler('crush-fork-session', async (params: any) => {
+            const directory = requireNonEmptyString(params?.directory, 'directory');
+            const crushSessionId = requireNonEmptyString(params?.crushSessionId, 'crushSessionId');
+            try {
+                const newSessionId = forkCrushSession(crushDbPath(directory), crushSessionId);
+                return { type: 'success', newSessionId };
+            } catch (error) {
+                rethrowMappedAgentForkError(error, CrushForkSourceMissingError);
+            }
+        });
+
+        this.rpcHandlerManager.registerHandler('crush-duplicate-session', async (params: any) => {
+            const directory = requireNonEmptyString(params?.directory, 'directory');
+            const crushSessionId = requireNonEmptyString(params?.crushSessionId, 'crushSessionId');
+            const cutAfterMessageId = requireNonEmptyString(params?.cutAfterMessageId, 'cutAfterMessageId');
+            try {
+                const newSessionId = forkAndTruncateCrushSession(
+                    crushDbPath(directory),
+                    crushSessionId,
+                    cutAfterMessageId,
+                );
+                return { type: 'success', newSessionId };
+            } catch (error) {
+                rethrowMappedAgentForkError(error, CrushForkSourceMissingError, CrushForkTruncateIdNotFoundError);
+            }
+        });
+
+        this.rpcHandlerManager.registerHandler('crush-list-rewind-points', async (params: any) => {
+            const directory = requireNonEmptyString(params?.directory, 'directory');
+            const crushSessionId = requireNonEmptyString(params?.crushSessionId, 'crushSessionId');
+            try {
+                const points = listCrushRewindPoints(crushDbPath(directory), crushSessionId);
+                return { type: 'success', points };
+            } catch (error) {
+                rethrowMappedAgentForkError(error, CrushForkSourceMissingError);
+            }
+        });
+
+        this.rpcHandlerManager.registerHandler('hermes-fork-session', async (params: any) => {
+            const acpSessionId = requireNonEmptyString(params?.acpSessionId, 'acpSessionId');
+            try {
+                const newSessionId = forkHermesSession(hermesDbPath(), acpSessionId);
+                return { type: 'success', newSessionId };
+            } catch (error) {
+                rethrowMappedAgentForkError(error, HermesForkSourceMissingError);
+            }
+        });
+
+        this.rpcHandlerManager.registerHandler('hermes-duplicate-session', async (params: any) => {
+            const acpSessionId = requireNonEmptyString(params?.acpSessionId, 'acpSessionId');
+            const cutAfterMessageId = requireMessageId(params?.cutAfterMessageId, 'cutAfterMessageId');
+            try {
+                const newSessionId = forkAndTruncateHermesSession(hermesDbPath(), acpSessionId, cutAfterMessageId);
+                return { type: 'success', newSessionId };
+            } catch (error) {
+                rethrowMappedAgentForkError(error, HermesForkSourceMissingError, HermesForkTruncateIdNotFoundError);
+            }
+        });
+
+        this.rpcHandlerManager.registerHandler('hermes-list-rewind-points', async (params: any) => {
+            const acpSessionId = requireNonEmptyString(params?.acpSessionId, 'acpSessionId');
+            try {
+                const points = listHermesRewindPoints(hermesDbPath(), acpSessionId);
+                return { type: 'success', points };
+            } catch (error) {
+                rethrowMappedAgentForkError(error, HermesForkSourceMissingError);
             }
         });
 

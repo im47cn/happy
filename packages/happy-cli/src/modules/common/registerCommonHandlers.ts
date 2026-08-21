@@ -139,6 +139,12 @@ export interface SpawnSessionOptions {
      * session attaches to a forked Codex app-server thread.
      */
     resumeCodexThreadId?: string;
+    /**
+     * If set, the daemon spawns the crush/hermes agent with `--resume <id>`
+     * so a fresh Happy session attaches to a forked agent session stored in
+     * the agent's own database (`.crush/crush.db` or the hermes state db).
+     */
+    resumeAgentSessionId?: string;
     /** Happy session id this fork was branched from (lineage). */
     parentSessionId?: string;
     /** Happy message id used as the rewind point (only set for "duplicate"). */

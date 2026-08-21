@@ -192,6 +192,12 @@ export interface SpawnSessionOptions {
      * session attaches to an app-server thread created by fork / duplicate.
      */
     resumeCodexThreadId?: string;
+    /**
+     * Generic resume passthrough for agents whose forked conversation id is
+     * neither a Claude UUID nor a Codex thread (currently Crush sessions and
+     * Hermes ACP sessions created by the fork / duplicate flow).
+     */
+    resumeAgentSessionId?: string;
     /** Happy session id this fork was branched from (lineage). */
     parentSessionId?: string;
     /** Happy message id used as the rewind point (only set for "duplicate"). */
@@ -245,6 +251,50 @@ export type CodexListRewindPointsResult =
     | { type: 'success'; points: CodexRewindPoint[] }
     | { type: 'error'; errorMessage: string };
 
+export interface CrushForkSessionOptions {
+    machineId: string;
+    /** Working directory of the source session, passed to the Crush server fork. */
+    directory: string;
+    /** Source Crush session id (Session.metadata.crushSessionId on the parent). */
+    crushSessionId: string;
+}
+
+export interface HermesForkSessionOptions {
+    machineId: string;
+    /** Working directory of the source session, passed to the ACP backend fork. */
+    directory: string;
+    /** Source Hermes ACP session id (Session.metadata.acpSessionId on the parent). */
+    acpSessionId: string;
+}
+
+/**
+ * Shared result of the agent fork RPCs (Crush, Hermes): the forked provider
+ * conversation id, resumed by the daemon spawn via `resumeAgentSessionId`.
+ */
+export type AgentForkSessionResult =
+    | { type: 'success'; newSessionId: string }
+    | { type: 'error'; errorMessage: string };
+
+export interface CrushRewindPoint {
+    id: string;
+    text: string;
+    timestamp: number;
+}
+
+export type CrushListRewindPointsResult =
+    | { type: 'success'; points: CrushRewindPoint[] }
+    | { type: 'error'; errorMessage: string };
+
+export interface HermesRewindPoint {
+    id: string;
+    text: string;
+    timestamp: number;
+}
+
+export type HermesListRewindPointsResult =
+    | { type: 'success'; points: HermesRewindPoint[] }
+    | { type: 'error'; errorMessage: string };
+
 export interface ResumeSessionOptions {
     machineId: string;
     sessionId: string;
@@ -257,7 +307,7 @@ export interface ResumeSessionOptions {
  */
 export async function machineSpawnNewSession(options: SpawnSessionOptions): Promise<SpawnSessionResult> {
 
-    const { machineId, directory, approvedNewDirectoryCreation = false, token, agent, permissionMode, modelMode, effortLevel, clientRequestId, providerId, modelId, effort, resumeClaudeSessionId, resumeCodexThreadId, parentSessionId, forkedFromMessageId, isSideChat } = options;
+    const { machineId, directory, approvedNewDirectoryCreation = false, token, agent, permissionMode, modelMode, effortLevel, clientRequestId, providerId, modelId, effort, resumeClaudeSessionId, resumeCodexThreadId, resumeAgentSessionId, parentSessionId, forkedFromMessageId, isSideChat } = options;
 
     try {
         if (agent === 'rig' && !clientRequestId) {
@@ -278,6 +328,7 @@ export async function machineSpawnNewSession(options: SpawnSessionOptions): Prom
             effort?: string,
             resumeClaudeSessionId?: string,
             resumeCodexThreadId?: string,
+            resumeAgentSessionId?: string,
             parentSessionId?: string,
             forkedFromMessageId?: string,
             isSideChat?: boolean,
@@ -294,7 +345,7 @@ export async function machineSpawnNewSession(options: SpawnSessionOptions): Prom
                 ...(modelId ? { modelId } : {}),
                 ...((effort ?? effortLevel) ? { effort: effort ?? effortLevel } : {}),
             }
-            : { type: 'spawn-in-directory', directory, approvedNewDirectoryCreation, token, agent, permissionMode, modelMode, effortLevel, resumeClaudeSessionId, resumeCodexThreadId, parentSessionId, forkedFromMessageId, isSideChat };
+            : { type: 'spawn-in-directory', directory, approvedNewDirectoryCreation, token, agent, permissionMode, modelMode, effortLevel, resumeClaudeSessionId, resumeCodexThreadId, resumeAgentSessionId, parentSessionId, forkedFromMessageId, isSideChat };
         const result = await apiSocket.machineRPC<SpawnSessionResult, SpawnRequest>(
             machineId,
             'spawn-happy-session',
@@ -457,6 +508,166 @@ export async function codexListRewindPoints(
         return {
             type: 'error',
             errorMessage: error instanceof Error ? error.message : 'Failed to list Codex rewind points',
+        };
+    }
+}
+
+/**
+ * Fork a Crush session on the daemon machine and return the new Crush
+ * session id. Caller then spawns a fresh Happy session with
+ * `resumeAgentSessionId` set to that id so the new session attaches to the
+ * forked conversation.
+ */
+export async function crushForkSession(options: CrushForkSessionOptions): Promise<AgentForkSessionResult> {
+    const { machineId, directory, crushSessionId } = options;
+    try {
+        const result = await apiSocket.machineRPC<AgentForkSessionResult, {
+            directory: string;
+            crushSessionId: string;
+        }>(
+            machineId,
+            'crush-fork-session',
+            { directory, crushSessionId },
+        );
+        return result;
+    } catch (error) {
+        return {
+            type: 'error',
+            errorMessage: error instanceof Error ? error.message : 'Failed to fork Crush session',
+        };
+    }
+}
+
+/**
+ * List user-text rewind points for a Crush session on the daemon machine.
+ */
+export async function crushListRewindPoints(
+    options: CrushForkSessionOptions,
+): Promise<CrushListRewindPointsResult> {
+    const { machineId, directory, crushSessionId } = options;
+    try {
+        const result = await apiSocket.machineRPC<CrushListRewindPointsResult, {
+            directory: string;
+            crushSessionId: string;
+        }>(
+            machineId,
+            'crush-list-rewind-points',
+            { directory, crushSessionId },
+        );
+        return result;
+    } catch (error) {
+        return {
+            type: 'error',
+            errorMessage: error instanceof Error ? error.message : 'Failed to list Crush rewind points',
+        };
+    }
+}
+
+/**
+ * Same as crushForkSession, but truncates the copied conversation right
+ * after the message with `cutAfterMessageId` (the rewind-point id from
+ * crushListRewindPoints — Crush message ids are UUID strings). Use this
+ * for "rewind to this message and try again" flows.
+ */
+export async function crushDuplicateSession(
+    options: CrushForkSessionOptions & { cutAfterMessageId: string },
+): Promise<AgentForkSessionResult> {
+    const { machineId, directory, crushSessionId, cutAfterMessageId } = options;
+    try {
+        const result = await apiSocket.machineRPC<AgentForkSessionResult, {
+            directory: string;
+            crushSessionId: string;
+            cutAfterMessageId: string;
+        }>(
+            machineId,
+            'crush-duplicate-session',
+            { directory, crushSessionId, cutAfterMessageId },
+        );
+        return result;
+    } catch (error) {
+        return {
+            type: 'error',
+            errorMessage: error instanceof Error ? error.message : 'Failed to duplicate Crush session',
+        };
+    }
+}
+
+/**
+ * Fork a Hermes session on the daemon machine and return the new ACP
+ * session id. Caller then spawns a fresh Happy session with
+ * `resumeAgentSessionId` set to that id so the new session attaches to the
+ * forked conversation.
+ */
+export async function hermesForkSession(options: HermesForkSessionOptions): Promise<AgentForkSessionResult> {
+    const { machineId, directory, acpSessionId } = options;
+    try {
+        const result = await apiSocket.machineRPC<AgentForkSessionResult, {
+            directory: string;
+            acpSessionId: string;
+        }>(
+            machineId,
+            'hermes-fork-session',
+            { directory, acpSessionId },
+        );
+        return result;
+    } catch (error) {
+        return {
+            type: 'error',
+            errorMessage: error instanceof Error ? error.message : 'Failed to fork Hermes session',
+        };
+    }
+}
+
+/**
+ * List user-text rewind points for a Hermes session on the daemon machine.
+ */
+export async function hermesListRewindPoints(
+    options: HermesForkSessionOptions,
+): Promise<HermesListRewindPointsResult> {
+    const { machineId, directory, acpSessionId } = options;
+    try {
+        const result = await apiSocket.machineRPC<HermesListRewindPointsResult, {
+            directory: string;
+            acpSessionId: string;
+        }>(
+            machineId,
+            'hermes-list-rewind-points',
+            { directory, acpSessionId },
+        );
+        return result;
+    } catch (error) {
+        return {
+            type: 'error',
+            errorMessage: error instanceof Error ? error.message : 'Failed to list Hermes rewind points',
+        };
+    }
+}
+
+/**
+ * Same as hermesForkSession, but truncates the copied conversation right
+ * after the message with `cutAfterMessageId` (the rewind-point id from
+ * hermesListRewindPoints — numeric on the daemon side). Use this for
+ * "rewind to message N and try again" flows.
+ */
+export async function hermesDuplicateSession(
+    options: HermesForkSessionOptions & { cutAfterMessageId: number },
+): Promise<AgentForkSessionResult> {
+    const { machineId, directory, acpSessionId, cutAfterMessageId } = options;
+    try {
+        const result = await apiSocket.machineRPC<AgentForkSessionResult, {
+            directory: string;
+            acpSessionId: string;
+            cutAfterMessageId: number;
+        }>(
+            machineId,
+            'hermes-duplicate-session',
+            { directory, acpSessionId, cutAfterMessageId },
+        );
+        return result;
+    } catch (error) {
+        return {
+            type: 'error',
+            errorMessage: error instanceof Error ? error.message : 'Failed to duplicate Hermes session',
         };
     }
 }
@@ -1057,16 +1268,54 @@ type CodexForkSource = {
     codexThreadId: string;
 };
 
+type CrushForkSource = {
+    kind: 'crush';
+    sessionId: string;
+    machineId: string;
+    directory: string;
+    crushSessionId: string;
+};
+
+type HermesForkSource = {
+    kind: 'hermes';
+    sessionId: string;
+    machineId: string;
+    directory: string;
+    acpSessionId: string;
+};
+
 // Forking source description used by forkAndSpawn.
-export type ForkSource = ClaudeForkSource | CodexForkSource;
+export type ForkSource = ClaudeForkSource | CodexForkSource | CrushForkSource | HermesForkSource;
 
 type ForkOptions = {
     cutAfterUuid?: string;
     cutAfterItemId?: string;
+    /** Truncation point for Crush duplicates — the provider rewind-point id (UUID string). */
+    cutAfterCrushMessageId?: string;
+    /** Truncation point for Hermes duplicates — the provider rewind-point id (numeric). */
+    cutAfterHermesMessageId?: number;
     forkedFromMessageId?: string;
     /** Marks the forked child as a hidden side chat (kept out of the session list). */
     isSideChat?: boolean;
 };
+
+/**
+ * Pull the newly-created session row into local sync state before we hand
+ * control back to the caller — otherwise router.replace into the new
+ * session id races the broadcast and the app screams "Session X not found"
+ * until the next sync tick lands.
+ */
+async function hydrateSpawnedSession(spawnResult: SpawnSessionResult): Promise<SpawnSessionResult> {
+    if (spawnResult.type === 'success') {
+        try {
+            await sync.refreshSessions();
+        } catch {
+            // Refresh is best-effort; the broadcast will still hydrate the
+            // session shortly even if this fetch flaked.
+        }
+    }
+    return spawnResult;
+}
 
 /**
  * Two-step orchestrator for the session fork / duplicate flow:
@@ -1113,15 +1362,54 @@ export async function forkAndSpawn(
             isSideChat: opts.isSideChat,
         });
 
-        if (spawnResult.type === 'success') {
-            try {
-                await sync.refreshSessions();
-            } catch {
-                // Refresh is best-effort; broadcast sync will still hydrate.
-            }
+        return hydrateSpawnedSession(spawnResult);
+    }
+
+    if (source.kind === 'crush' || source.kind === 'hermes') {
+        const cutAfterCrushMessageId = source.kind === 'crush' ? opts.cutAfterCrushMessageId : undefined;
+        const cutAfterHermesMessageId = source.kind === 'hermes' ? opts.cutAfterHermesMessageId : undefined;
+        const forkResult = source.kind === 'crush'
+            ? (cutAfterCrushMessageId !== undefined
+                ? await crushDuplicateSession({
+                    machineId: source.machineId,
+                    directory: source.directory,
+                    crushSessionId: source.crushSessionId,
+                    cutAfterMessageId: cutAfterCrushMessageId,
+                })
+                : await crushForkSession({
+                    machineId: source.machineId,
+                    directory: source.directory,
+                    crushSessionId: source.crushSessionId,
+                }))
+            : (cutAfterHermesMessageId !== undefined
+                ? await hermesDuplicateSession({
+                    machineId: source.machineId,
+                    directory: source.directory,
+                    acpSessionId: source.acpSessionId,
+                    cutAfterMessageId: cutAfterHermesMessageId,
+                })
+                : await hermesForkSession({
+                    machineId: source.machineId,
+                    directory: source.directory,
+                    acpSessionId: source.acpSessionId,
+                }));
+
+        if (forkResult.type !== 'success') {
+            return { type: 'error', errorMessage: forkResult.errorMessage };
         }
 
-        return spawnResult;
+        const spawnResult = await machineSpawnNewSession({
+            machineId: source.machineId,
+            directory: source.directory,
+            agent: source.kind,
+            approvedNewDirectoryCreation: false,
+            resumeAgentSessionId: forkResult.newSessionId,
+            parentSessionId: source.sessionId,
+            forkedFromMessageId: opts.forkedFromMessageId,
+            isSideChat: opts.isSideChat,
+        });
+
+        return hydrateSpawnedSession(spawnResult);
     }
 
     const forkResult = opts.cutAfterUuid
@@ -1152,20 +1440,7 @@ export async function forkAndSpawn(
         isSideChat: opts.isSideChat,
     });
 
-    // Pull the newly-created session row into local sync state before we
-    // hand control back to the caller — otherwise router.replace into the
-    // new session id races the broadcast and the app screams
-    // "Session X not found" until the next sync tick lands.
-    if (spawnResult.type === 'success') {
-        try {
-            await sync.refreshSessions();
-        } catch {
-            // Refresh is best-effort; the broadcast will still hydrate the
-            // session shortly even if this fetch flaked.
-        }
-    }
-
-    return spawnResult;
+    return hydrateSpawnedSession(spawnResult);
 }
 
 /**

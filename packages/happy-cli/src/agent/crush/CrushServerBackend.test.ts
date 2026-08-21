@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { mapCrushEventToAgentMessages } from './CrushServerBackend';
+import { describe, expect, it, vi } from 'vitest';
+import { CrushServerBackend, mapCrushEventToAgentMessages } from './CrushServerBackend';
 import { createCrushBackend, registerCrushAgent } from './index';
 import { agentRegistry } from '../core';
 
@@ -160,5 +160,39 @@ describe('registerCrushAgent', () => {
     const backend = agentRegistry.create('crush', { cwd: process.cwd() });
     expect(backend).toBeTruthy();
     expect(typeof backend.startSession).toBe('function');
+  });
+});
+
+describe('CrushServerBackend session resume', () => {
+  /** Wire the server subprocess and SSE subscription out; record HTTP calls. */
+  function stubHttp(backend: CrushServerBackend): Array<[string, string]> {
+    const calls: Array<[string, string]> = [];
+    vi.spyOn(backend as any, 'startCrushServer').mockResolvedValue(undefined);
+    vi.spyOn(backend as any, 'subscribeToEvents').mockImplementation(() => undefined);
+    vi.spyOn(backend as any, 'httpRequest').mockImplementation(async (method: any, path: any) => {
+      calls.push([method, path]);
+      if (method === 'POST' && path === '/v1/workspaces') return { id: 'ws-1' };
+      if (method === 'GET' && path === '/v1/workspaces/ws-1/sessions/crush-1') return { id: 'crush-1' };
+      return null;
+    });
+    return calls;
+  }
+
+  it('resumes the requested session id instead of creating one', async () => {
+    const backend = new CrushServerBackend({ agentName: 'crush', cwd: '/tmp/project', resumeSessionId: 'crush-1' });
+    const calls = stubHttp(backend);
+
+    const result = await backend.startSession();
+
+    expect(result).toEqual({ sessionId: 'crush-1' });
+    expect(calls).not.toContainEqual(['POST', '/v1/workspaces/ws-1/sessions']);
+    expect(calls).toContainEqual(['GET', '/v1/workspaces/ws-1/sessions/crush-1']);
+  });
+
+  it('fails fast when the resumed session is missing from crush.db', async () => {
+    const backend = new CrushServerBackend({ agentName: 'crush', cwd: '/tmp/project', resumeSessionId: 'gone' });
+    stubHttp(backend);
+
+    await expect(backend.startSession()).rejects.toThrow('Crush session gone not found');
   });
 });

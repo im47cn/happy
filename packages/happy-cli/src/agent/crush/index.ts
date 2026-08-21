@@ -27,6 +27,12 @@ export interface CrushBackendOptions extends AgentFactoryOptions {
 
   /** Extra arguments to pass to `crush server` */
   extraArgs?: string[];
+
+  /**
+   * Resume this existing crush session id instead of creating a new one
+   * (fork / duplicate flow).
+   */
+  resumeSessionId?: string;
 }
 
 /**
@@ -47,6 +53,7 @@ export function createCrushBackend(options: CrushBackendOptions): AgentBackend {
     mcpServers: options.mcpServers,
     command: options.command,
     extraArgs: options.extraArgs,
+    resumeSessionId: options.resumeSessionId,
   });
 }
 

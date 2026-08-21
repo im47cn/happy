@@ -60,6 +60,13 @@ export interface CrushServerBackendOptions {
 
   /** Extra arguments to pass to `crush server` */
   extraArgs?: string[];
+
+  /**
+   * Resume this existing crush session id instead of creating a new one.
+   * Used by the fork / duplicate flow: the fork RPC copies the session rows
+   * in `.crush/crush.db` and the backend resumes the copy by id.
+   */
+  resumeSessionId?: string;
 }
 
 /** Session info returned by the Crush server */
@@ -573,15 +580,32 @@ export class CrushServerBackend implements AgentBackend {
       // Initialize the agent
       await this.httpRequest('POST', `/v1/workspaces/${this.workspaceId}/agent/init`);
 
-      // Create a session
-      const session = await this.httpRequest('POST', `/v1/workspaces/${this.workspaceId}/sessions`, {
-        title: 'Happy Session',
-      }) as CrushSession | null;
-      if (!session?.id) {
-        throw new Error('Failed to create crush session');
+      if (this.options.resumeSessionId) {
+        // v0.80 server behavior: POST /sessions ignores a client-supplied
+        // id and always creates a fresh session, so resuming skips the
+        // create call and reuses the forked id — the server loads the
+        // session row from crush.db on demand. The GET fails fast when the
+        // forked session is missing from the database.
+        const existing = await this.httpRequest(
+          'GET',
+          `/v1/workspaces/${this.workspaceId}/sessions/${this.options.resumeSessionId}`,
+        ) as CrushSession | null;
+        if (!existing?.id) {
+          throw new Error(`Crush session ${this.options.resumeSessionId} not found`);
+        }
+        this.crushSessionId = existing.id;
+        logger.debug(`[CrushServerBackend] Resuming session: ${this.crushSessionId}`);
+      } else {
+        // Create a session
+        const session = await this.httpRequest('POST', `/v1/workspaces/${this.workspaceId}/sessions`, {
+          title: 'Happy Session',
+        }) as CrushSession | null;
+        if (!session?.id) {
+          throw new Error('Failed to create crush session');
+        }
+        this.crushSessionId = session.id;
+        logger.debug(`[CrushServerBackend] Session created: ${this.crushSessionId}`);
       }
-      this.crushSessionId = session.id;
-      logger.debug(`[CrushServerBackend] Session created: ${this.crushSessionId}`);
 
       // Subscribe to events
       this.subscribeToEvents();

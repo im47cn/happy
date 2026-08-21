@@ -139,6 +139,8 @@ export function useSessionQuickActions(
         session.metadata?.path,
         session.metadata?.claudeSessionId,
         session.metadata?.codexThreadId,
+        session.metadata?.crushSessionId,
+        session.metadata?.acpSessionId,
     ]);
     const canFork = Boolean(
         expResumeSession

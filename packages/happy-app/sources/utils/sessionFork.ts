@@ -16,7 +16,23 @@ export type CodexForkSource = {
     codexThreadId: string;
 };
 
-export type ForkSource = ClaudeForkSource | CodexForkSource;
+export type CrushForkSource = {
+    kind: 'crush';
+    sessionId: string;
+    machineId: string;
+    directory: string;
+    crushSessionId: string;
+};
+
+export type HermesForkSource = {
+    kind: 'hermes';
+    sessionId: string;
+    machineId: string;
+    directory: string;
+    acpSessionId: string;
+};
+
+export type ForkSource = ClaudeForkSource | CodexForkSource | CrushForkSource | HermesForkSource;
 
 function nonEmpty(value: unknown): value is string {
     return typeof value === 'string' && value.trim().length > 0;
@@ -40,6 +56,34 @@ export function getSessionForkSource(session: Session): ForkSource | null {
             machineId,
             directory,
             codexThreadId,
+        };
+    }
+
+    if (session.metadata?.flavor === 'crush') {
+        const crushSessionId = session.metadata?.crushSessionId;
+        if (!nonEmpty(crushSessionId)) {
+            return null;
+        }
+        return {
+            kind: 'crush',
+            sessionId: session.id,
+            machineId,
+            directory,
+            crushSessionId,
+        };
+    }
+
+    if (session.metadata?.flavor === 'hermes') {
+        const acpSessionId = session.metadata?.acpSessionId;
+        if (!nonEmpty(acpSessionId)) {
+            return null;
+        }
+        return {
+            kind: 'hermes',
+            sessionId: session.id,
+            machineId,
+            directory,
+            acpSessionId,
         };
     }
 

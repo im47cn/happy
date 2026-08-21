@@ -19,6 +19,8 @@ import {
   type InitializeRequest,
   type NewSessionRequest,
   type NewSessionResponse,
+  type LoadSessionRequest,
+  type LoadSessionResponse,
   type PromptRequest,
   type ContentBlock,
 } from '@agentclientprotocol/sdk';
@@ -204,6 +206,13 @@ export interface AcpBackendOptions {
   /** Optional callback to check if prompt has change_title instruction */
   hasChangeTitleInstruction?: (prompt: string) => boolean;
 
+  /**
+   * Resume this existing ACP session via `session/load` instead of creating
+   * a new one. Used by the fork / duplicate flow: the fork RPC copies the
+   * agent's session rows on disk and the CLI resumes the copy by id.
+   */
+  resumeSessionId?: string;
+
   /** Log raw session updates to console */
   verbose?: boolean;
 }
@@ -376,12 +385,11 @@ export class AcpBackend implements AgentBackend {
       throw new Error('Backend has been disposed');
     }
 
-    const sessionId = randomUUID();
     this.emit({ type: 'status', status: 'starting' });
     let startupStatusErrorEmitted = false;
 
     try {
-      logger.debug(`[AcpBackend] Starting session: ${sessionId}`);
+      logger.debug(`[AcpBackend] Starting session (resume id: ${this.options.resumeSessionId ?? 'none'})`);
       // Spawn the ACP agent process
       const args = this.options.args || [];
       
@@ -794,63 +802,84 @@ export class AcpBackend implements AgentBackend {
         mcpServers: mcpServers as unknown as NewSessionRequest['mcpServers'],
       };
 
-      logger.debug(`[AcpBackend] Creating new session...`);
-
-      const sessionResponse = await withRetry(
-        async () => {
-          let timeoutHandle: NodeJS.Timeout | null = null;
-          try {
-            const result = await Promise.race([
-              startupFailurePromise,
-              this.connection!.newSession(newSessionRequest).then((res) => {
+      // Resuming a forked session loads it by id (session/load); otherwise
+      // create a fresh one (session/new).
+      const resumeSessionId = this.options.resumeSessionId;
+      const sessionResponse: NewSessionResponse | LoadSessionResponse = resumeSessionId
+        ? await withRetry(
+            () => this.connection!.loadSession({
+              cwd: this.options.cwd,
+              mcpServers: mcpServers as unknown as LoadSessionRequest['mcpServers'],
+              sessionId: resumeSessionId,
+            } satisfies LoadSessionRequest),
+            {
+              operationName: 'LoadSession',
+              maxAttempts: RETRY_CONFIG.maxAttempts,
+              baseDelayMs: RETRY_CONFIG.baseDelayMs,
+              maxDelayMs: RETRY_CONFIG.maxDelayMs,
+              shouldRetry: (error) => !isNonRetryableStartupError(error),
+            }
+          )
+        : await withRetry(
+            async () => {
+              let timeoutHandle: NodeJS.Timeout | null = null;
+              try {
+                const result = await Promise.race([
+                  startupFailurePromise,
+                  this.connection!.newSession(newSessionRequest).then((res) => {
+                    if (timeoutHandle) {
+                      clearTimeout(timeoutHandle);
+                      timeoutHandle = null;
+                    }
+                    return res;
+                  }),
+                  new Promise<never>((_, reject) => {
+                    timeoutHandle = setTimeout(() => {
+                      reject(new Error(`New session timeout after ${initTimeout}ms - ${this.transport.agentName} did not respond`));
+                    }, initTimeout);
+                  }),
+                ]);
+                return result;
+              } finally {
                 if (timeoutHandle) {
                   clearTimeout(timeoutHandle);
-                  timeoutHandle = null;
                 }
-                return res;
-              }),
-              new Promise<never>((_, reject) => {
-                timeoutHandle = setTimeout(() => {
-                  reject(new Error(`New session timeout after ${initTimeout}ms - ${this.transport.agentName} did not respond`));
-                }, initTimeout);
-              }),
-            ]);
-            return result;
-          } finally {
-            if (timeoutHandle) {
-              clearTimeout(timeoutHandle);
+              }
+            },
+            {
+              operationName: 'NewSession',
+              maxAttempts: RETRY_CONFIG.maxAttempts,
+              baseDelayMs: RETRY_CONFIG.baseDelayMs,
+              maxDelayMs: RETRY_CONFIG.maxDelayMs,
+              shouldRetry: (error) => !isNonRetryableStartupError(error),
             }
-          }
-        },
-        {
-          operationName: 'NewSession',
-          maxAttempts: RETRY_CONFIG.maxAttempts,
-          baseDelayMs: RETRY_CONFIG.baseDelayMs,
-          maxDelayMs: RETRY_CONFIG.maxDelayMs,
-          shouldRetry: (error) => !isNonRetryableStartupError(error),
-        }
-      );
-      this.acpSessionId = sessionResponse.sessionId;
-      logger.debug(`[AcpBackend] Session created: ${this.acpSessionId}`);
+          );
+      // session/load does not echo the session id back, so a resumed
+      // session keeps the id we asked for.
+      const acpId = resumeSessionId ?? (sessionResponse as NewSessionResponse).sessionId;
+      this.acpSessionId = acpId;
+      logger.debug(`[AcpBackend] Session ${resumeSessionId ? 'loaded' : 'created'}: ${acpId}`);
       if (this.options.verbose) {
         logAcpBackendMuted(
-          `Incoming newSession response from ${this.options.agentName}: ${summarizeSessionMetadataPayload(sessionResponse)}`,
+          `Incoming session response from ${this.options.agentName}: ${summarizeSessionMetadataPayload(sessionResponse)}`,
         );
       }
-      this.emitInitialSessionMetadata(sessionResponse);
+      this.emitInitialSessionMetadata(sessionResponse as NewSessionResponse);
 
       this.emitIdleStatus();
 
       // Send initial prompt if provided
       if (initialPrompt) {
-        this.sendPrompt(sessionId, initialPrompt).catch((error) => {
+        this.sendPrompt(acpId, initialPrompt).catch((error) => {
           // Log to file only, not console
           logger.debug('[AcpBackend] Error sending initial prompt:', error);
           this.emit({ type: 'status', status: 'error', detail: String(error) });
         });
       }
 
-      return { sessionId };
+      // Report the real ACP session id (freshly created or resumed) so
+      // callers can record it for later forks.
+      return { sessionId: acpId };
 
     } catch (error) {
       // Log to file only, not console

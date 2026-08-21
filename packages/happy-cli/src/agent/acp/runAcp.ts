@@ -504,6 +504,11 @@ export interface RunAcpOptions {
   externalPermissions?: boolean;
   startedBy?: 'daemon' | 'terminal';
   verbose?: boolean;
+  /**
+   * Resume this agent session id instead of creating a new one — used by
+   * the fork / duplicate flow (`--resume <id>` on the CLI subcommand).
+   */
+  resumeSessionId?: string;
 }
 
 export async function runAcp(opts: RunAcpOptions): Promise<void> {
@@ -605,6 +610,7 @@ export async function runAcp(opts: RunAcpOptions): Promise<void> {
         // everything else rides the defaults
         transportHandler: opts.agentName === 'hermes' ? hermesTransport : new DefaultTransport(opts.agentName),
         verbose,
+        resumeSessionId: opts.resumeSessionId,
       });
 
   let thinking = false;
@@ -961,6 +967,14 @@ export async function runAcp(opts: RunAcpOptions): Promise<void> {
   try {
     const started = await backend.startSession();
     acpSessionId = started.sessionId;
+    // Record the agent's own session id so the app can fork / rewind this
+    // conversation later (mirrors claudeSessionId / codexThreadId).
+    session.updateMetadata((currentMetadata) => ({
+      ...currentMetadata,
+      ...(opts.agentName === 'crush'
+        ? { crushSessionId: started.sessionId }
+        : { acpSessionId: started.sessionId }),
+    }));
     if (verbose) {
       if (!sawSlashCommands) {
         logAcp('muted', `Outgoing slash commands from ${opts.agentName}: not reported yet`);
